@@ -350,6 +350,11 @@ function wp_photo_wall_text($key)
             'zh_CN' => '移动选中',
             'zh_TW' => '移動選中'
         ),
+        'settings_link' => array(
+            'en' => 'Settings',
+            'zh_CN' => '设置',
+            'zh_TW' => '設定'
+        ),
     );
 
     if (isset($texts[$key][$lang])) {

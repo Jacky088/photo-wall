@@ -101,6 +101,17 @@ function wp_photo_wall_menu()
 add_action('admin_menu', 'wp_photo_wall_menu');
 
 /**
+ * Add "Settings" link to the plugin action links (停用 | 设置)
+ */
+function wp_photo_wall_plugin_action_links($links)
+{
+    $settings_link = '<a href="' . esc_url(admin_url('admin.php?page=wp-photo-wall')) . '">' . esc_html(wp_photo_wall_text('settings_link')) . '</a>';
+    $links[] = $settings_link;
+    return $links;
+}
+add_filter('plugin_action_links_' . plugin_basename(__FILE__), 'wp_photo_wall_plugin_action_links');
+
+/**
  * Render Admin Page
  */
 function wp_photo_wall_render_admin_page()
