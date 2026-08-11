@@ -1,144 +1,144 @@
-# WP Photo Wall
+# 照片墙插件 (WP Photo Wall)
 
-A minimalist photo wall WordPress plugin with powerful admin management and optimized frontend performance.
+一个极简风格的照片墙 WordPress 插件，带有强大的后台管理和极致的前端性能优化。
 
-## Preview
+## 页面预览
 
-![photowall preview](./screenshot-preview-pc-photowall.jpg)
+![photowall 预览](./screenshot-preview-pc-photowall.jpg)
 
-## Features
+## ✨ 特性
 
-- **Minimalist design**: clean, modern UI.
-- **Powerful admin management**:
-    - Add local images from the WordPress Media Library.
-    - Add external link images (CDN URLs with query params supported).
-    - **Group management**: create multiple groups, move images via drag & drop or batch selection.
-    - **Group ordering**: drag the handle on the left of a group title to reorder groups on the frontend.
-    - **Batch operations**: batch move groups, batch remove from wall, permanent delete from Media Library.
-- **Performance optimized**:
-    - **Admin**: thumbnails preloaded once on the PHP side, eliminating N+1 AJAX requests; batched DOM updates.
-    - **Frontend**:
-        - **Async decode (`decoding="async"`)** to avoid blocking the main thread.
-        - **Content visibility (`content-visibility`)**: only renders images in the viewport, greatly reducing memory usage.
-        - **Lazy loading (`loading="lazy"`)** for faster first paint.
-        - **Scroll throttling**: hover animations are disabled while scrolling for smoother mobile experience.
-        - **Fade-in animation**: staggered fade-in on image load.
-- **Responsive layout**: adapts to desktop, tablet, and mobile.
-- **Built-in Lightbox**: lightweight lightbox with keyboard navigation and focus trap.
-- **Top Banner Carousel**: an automatic carousel of manually selected images at the top of each `[photo_wall]`, with local Media Library and external link support, configurable interval, slide transition, hover pause, and click-to-lightbox.
+- **极简设计**: 采用极简风格的 UI 设计，清爽、现代。
+- **强大的后台管理**:
+    - 支持从 WordPress 媒体库添加本地图片。
+    - 支持添加外部链接图片（兼容 CDN 带参数的 URL）。
+    - **分组管理**：创建多个分组，通过拖拽或批量选择移动图片到目标分组。
+    - **分组排序**：拖动分组标题左侧抓手图标，即可调整分组在前台的展示顺序。
+    - **批量操作**：支持批量移动分组、批量从照片墙移除、从媒体库永久删除。
+- **极致性能优化**:
+    - **后台**: 缩略图由 PHP 端一次性预加载，消除 N+1 AJAX 请求；批量 DOM 更新。
+    - **前台**:
+        - **异步解码 (`decoding="async"`)**：防止大图解码阻塞主线程。
+        - **智能可见性 (`content-visibility`)**：只渲染视口内的图片，极大降低内存占用。
+        - **懒加载 (`loading="lazy"`)**：提升首屏加载速度。
+        - **滚动节流**：滚动时自动禁用 hover 动画，提升移动端流畅度。
+        - **淡入动画**：图片加载时带有错落的淡入效果，视觉体验流畅优雅。
+- **响应式布局**: 自动适应桌面、平板和手机。
+- **内置灯箱 (Lightbox)**: 自带轻量级灯箱效果，支持键盘左右切换、焦点陷阱。
+- **顶部海报轮播 (Banner Carousel)**: 在每个 `[photo_wall]` 顶部展示手动选图组成的自动轮播，支持本地媒体库与外部链接，可配置轮播间隔、滑动过渡、悬停暂停、点击进灯箱。
 
-## Project Structure
+## 📁 项目结构
 
 ```
 photo-wall/
-├── wp-photo-wall.php          # Main entry file (lightweight loader)
+├── wp-photo-wall.php          # 主入口文件（精简加载器）
 ├── includes/
-│   ├── i18n.php               # i18n translation definitions
-│   ├── data.php               # Data operations and validation
-│   ├── ajax.php               # AJAX request handling
-│   ├── frontend.php           # Frontend rendering and shortcode
-│   └── slides.php             # Top carousel data layer and rendering
+│   ├── i18n.php               # 多语言翻译定义
+│   ├── data.php               # 数据操作与校验
+│   ├── ajax.php               # AJAX 请求处理
+│   ├── frontend.php           # 前端渲染与短代码
+│   └── slides.php             # 顶部轮播数据层与渲染
 ├── admin/
-│   ├── admin-page.php         # Admin page template
-│   ├── admin-slides.php       # Admin carousel management template
-│   ├── admin-script.js        # Admin interaction logic
-│   └── admin-style.css        # Admin styles
+│   ├── admin-page.php         # 后台页面模板
+│   ├── admin-slides.php       # 后台轮播管理模板
+│   ├── admin-script.js        # 后台交互逻辑
+│   └── admin-style.css        # 后台样式
 ├── public/
-│   ├── shortcode.php          # Shortcode output template
-│   ├── gallery-script.js      # Frontend interaction (lightbox, infinite scroll)
-│   ├── gallery-style.css      # Frontend styles
-│   ├── slider-script.js       # Frontend carousel interaction (autoplay, slide, hover pause)
-│   └── slider-style.css       # Frontend carousel styles
-├── uninstall.php              # Uninstall cleanup
+│   ├── shortcode.php          # 短代码输出模板
+│   ├── gallery-script.js      # 前台交互（灯箱、无限滚动）
+│   ├── gallery-style.css      # 前台样式
+│   ├── slider-script.js       # 前台轮播交互（自动播放、滑动、悬停暂停）
+│   └── slider-style.css       # 前台轮播样式
+├── uninstall.php              # 卸载清理
 └── README.md
 ```
 
-## Installation
+## 📥 安装
 
-1. Download the plugin zip (`photo-wall-2.1.0.zip`).
-2. In WordPress admin → **Plugins** → **Add New**.
-3. Click **Upload Plugin**, select the zip file and install.
-4. Activate the plugin.
+1. 下载插件压缩包（`photo-wall-2.1.0.zip`）。
+2. 在 WordPress 后台 → **插件** → **安装插件**。
+3. 点击 **上传插件**，选择 zip 文件并安装。
+4. 启用插件。
 
-## Usage
+## 🚀 使用方法
 
-### 1. Add Images
+### 1. 添加图片
 
-Find the **"Photo Wall"** menu in the WordPress admin sidebar.
+在 WordPress 后台侧边栏找到 **"照片墙"** 菜单。
 
-- Click **"Select/Upload Photos"** to choose from the Media Library.
-- Click **"Add External Link"** to enter an image URL.
-- Newly added images default to the "Ungrouped" area.
+- 点击 **"选择/上传照片"** 从媒体库选择。
+- 点击 **"添加外部链接"** 输入图片 URL。
+- 新添加的图片默认放入"未分组"。
 
-### 2. Group Management
+### 2. 分组管理
 
-- Enter a name at the top of the photo management area and click **"Add Group"**.
-- **Drag images**: drag an image directly to the target group.
-- **Batch move**: check images → click **"Move Selected"** → pick the target group → confirm.
-- **Reorder groups**: drag the handle (≡) on the left of a group title.
-- All changes take effect after clicking **"Save Changes"**.
+- 在照片管理区域顶部输入名称，点击 **"添加分组"** 创建新分组。
+- **拖拽图片**：直接拖动图片到目标分组。
+- **批量移动**：勾选图片 → 点击"移动选中"按钮 → 在弹窗中选择目标分组 → 确认。
+- **调整分组顺序**：拖动分组标题左侧的 ≡ 图标。
+- 所有操作需要点击 **"保存更改"** 才会生效。
 
-### 3. Display on a Page
+### 3. 在页面显示
 
-Use the shortcode in any page or post:
+在任意页面或文章中使用短代码：
 
 ```
 [photo_wall]
 ```
 
-> Images must be moved into a created group to appear on the frontend; "Ungrouped" is a backend staging area and is not publicly displayed.
+> 图片必须移动到一个已创建的分组后才会显示在前台；"未分组"是后台暂存区，不会公开显示。
 
-Multiple `[photo_wall]` instances can be placed on the same page; each instance has independent pagination and lightbox state. Each instance's top carousel is also independent (shares the same selection config but plays independently).
+同一页面可以放置多个 `[photo_wall]`，每个实例的分页和灯箱状态彼此独立。每个实例的顶部轮播也相互独立（共用同一组选图配置，各自独立播放）。
 
-### 4. Top Banner Carousel
+### 4. 顶部海报轮播
 
-In the **"Photo Wall"** admin page, find the **"Top Banner Carousel"** section at the top:
+在后台 **"照片墙"** 菜单页面顶部，找到 **"顶部海报轮播"** 区块：
 
-- Check **"Enable Carousel"** to show an auto-playing carousel at the top of each `[photo_wall]`.
-- Click **"Add from Media Library"** to pick local images, or **"Add External Link"** to enter an image URL.
-- Drag the handle on the left of an image to reorder the carousel.
-- Set the **"Interval"** (seconds) and the **"Open Lightbox on Click"** toggle.
-- All changes take effect after clicking **"Save Changes"**.
+- 勾选 **"启用轮播"** 后，每个 `[photo_wall]` 顶部会显示自动轮播。
+- 点击 **"从媒体库添加"** 选择本地图片，或 **"添加外部链接"** 输入图片 URL。
+- 拖动图片左侧抓手可调整轮播顺序。
+- 设置 **"轮播间隔"**（秒）与 **"点击打开灯箱"** 开关。
+- 所有操作需点击 **"保存更改"** 生效。
 
-The carousel supports slide transition, hover/focus pause, touch swipe, and reuses the existing lightbox for full-size viewing.
+轮播支持滑动过渡、悬停/聚焦暂停、触摸滑动切换、不同尺寸图片自动裁切铺满（`object-fit: cover`），并复用现有灯箱查看大图。
 
-### 5. Frontend Features
+### 5. 前端功能
 
-- Hovering an image gives a subtle lift effect.
-- Click an image to open the fullscreen lightbox.
-- Scrolling to the bottom auto-loads more (infinite scroll).
-- The lightbox supports keyboard navigation (←→ to switch, Esc to close), focus cycling, and focus restoration.
+- 悬停图片会有轻微上浮效果。
+- 点击图片进入全屏灯箱模式。
+- 滚动到底部会自动加载更多（无限滚动）。
+- 灯箱支持键盘导航（←→切换，Esc 关闭）、焦点循环和关闭后焦点恢复。
 
-### 6. Settings
+### 6. 设置选项
 
-- **Enable Lightbox**: turn off the built-in lightbox if your theme already provides one.
-- **Download Button Link**: configure an external drive download URL shown on the frontend.
-- **Top Banner Carousel**: enable/disable carousel, set autoplay interval, click-to-lightbox.
+- **启用灯箱**：可关闭内置灯箱（适用于主题已有灯箱的情况）。
+- **下载按钮链接**：配置外部网盘下载地址，前台显示下载入口。
+- **顶部海报轮播**：启用/禁用轮播、设置自动播放间隔、点击进灯箱。
 
-## Requirements
+## 📋 系统要求
 
 - WordPress 6.0+
 - PHP 7.4+
 
-## Changelog
+## 🔄 更新日志
 
 ### 2.1.0
-- **New**: Top banner carousel (manual selection + autoplay)
-    - Local Media Library images and external link images supported
-    - Each `[photo_wall]` instance displays and plays independently
-    - Slide transition, hover/focus pause, touch swipe
-    - Click to open the existing lightbox for full-size view (configurable)
-    - Data stored independently (separate option), no impact on the original photo wall structure or layout
-    - Images auto cropped and filled (`object-fit: cover`) so different sizes never leave blank gaps
+- **新增**：顶部海报轮播功能（手动选图 + 自动轮播）
+    - 支持本地媒体库图片与外部链接图片
+    - 每个 `[photo_wall]` 实例独立显示，各自独立播放
+    - 滑动过渡、悬停/聚焦暂停、触摸滑动切换
+    - 点击进入现有灯箱查看大图（可配置）
+    - 数据独立存储（独立 option），不影响原有照片墙结构与布局
+    - 不同尺寸图片自动裁切铺满（object-fit: cover），不留空白
 
 ### 2.0.3
-- **Frontend**: staggered fade-in animation on image load
-- **Frontend**: redesigned group titles with gradient accent line and more spacing
-- **Fix**: unsaved-changes notice falsely triggered on initial page load
-- **Improvement**: unsaved-changes notice moved to a prominent top notification bar
-- **Refactor**: split main file into modular structure (i18n / data / ajax / frontend)
-- **Performance**: thumbnails preloaded once on the PHP side, eliminating N+1 AJAX requests
+- **前端优化**：图片加载淡入动画，错落延迟效果，视觉更柔和
+- **前端优化**：分组标题重构，渐变色装饰线 + 加大分组间距，更有质感和呼吸感
+- **修复**：未保存提醒在页面初始加载时误触发的问题
+- **改进**：未保存提醒移至页面顶部醒目位置，使用自定义通知条样式
+- **架构重构**：主文件拆分为模块化结构（i18n / data / ajax / frontend），可维护性大幅提升
+- **性能优化**：后台缩略图由 PHP 端一次性预加载，消除 N+1 AJAX 请求
 
-## License
+## 📜 许可证
 
 GPL v2 or later
