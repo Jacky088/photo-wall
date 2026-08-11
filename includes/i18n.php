@@ -363,9 +363,9 @@ function wp_photo_wall_text($key)
             'zh_TW' => '頂部海報輪播'
         ),
         'slides_desc' => array(
-            'en' => 'Manually selected images shown as an auto-playing carousel at the top of each [photo_wall]. Supports local media library images and external links.',
-            'zh_CN' => '在每个 [photo_wall] 顶部展示的自动轮播海报。支持本地媒体库图片和外部链接图片。',
-            'zh_TW' => '在每個 [photo_wall] 頂部展示的自動輪播海報。支持本地媒體庫圖片和外部鏈接圖片。'
+            'en' => 'Supports local media library images and external links.',
+            'zh_CN' => '支持本地媒体库图片和外部链接图片。',
+            'zh_TW' => '支持本地媒體庫圖片和外部鏈接圖片。'
         ),
         'slides_enable' => array(
             'en' => 'Enable Carousel',
