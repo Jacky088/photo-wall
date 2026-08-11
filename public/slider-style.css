@@ -43,11 +43,27 @@
     -webkit-user-drag: none;
 }
 
-.wp-pw-slide a {
+.wp-pw-slide a,
+.wp-pw-slide .wp-photo-wall-lightbox-trigger,
+.wp-pw-slide .wp-pw-slide-image {
     display: block;
     width: 100%;
     height: 100%;
     cursor: zoom-in;
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    line-height: 0;
+    text-align: left;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.wp-pw-slide .wp-pw-slide-image {
+    cursor: default;
+    pointer-events: none;
 }
 
 /* Navigation arrows */

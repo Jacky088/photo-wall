@@ -168,15 +168,16 @@ function wp_photo_wall_render_slider($instance_id) {
         $cls   = $index === 0 ? ' is-active' : '';
 
         if ($link) {
+            // Use <button> instead of <a href> so third-party lightboxes that
+            // hook a[href$="*.jpg"] etc. cannot hijack the click.
             $slides_html .= sprintf(
                 '<div class="wp-pw-slide%s" data-index="%d">' .
-                    '<a href="%s" class="wp-photo-wall-lightbox-trigger" data-full-url="%s">' .
+                    '<button type="button" class="wp-photo-wall-lightbox-trigger wp-photo-wall-no-third-party-lightbox" data-full-url="%s" data-no-lightbox="1" aria-haspopup="dialog">' .
                         '<img src="%s" alt="" decoding="async" loading="%s">' .
-                    '</a>' .
+                    '</button>' .
                 '</div>',
                 $cls,
                 $index,
-                esc_attr($full),
                 esc_attr($full),
                 $url,
                 $index === 0 ? 'eager' : 'lazy'
@@ -184,7 +185,9 @@ function wp_photo_wall_render_slider($instance_id) {
         } else {
             $slides_html .= sprintf(
                 '<div class="wp-pw-slide%s" data-index="%d">' .
-                    '<img src="%s" alt="" decoding="async" loading="%s">' .
+                    '<span class="wp-pw-slide-image" aria-hidden="true">' .
+                        '<img src="%s" alt="" decoding="async" loading="%s">' .
+                    '</span>' .
                 '</div>',
                 $cls,
                 $index,

@@ -147,17 +147,24 @@
         }
 
         updateItems();
-        $instance.on('click', '.wp-photo-wall-lightbox-trigger', function (event) {
+
+        // Handle trigger clicks in the CAPTURE phase at the WINDOW level. This
+        // is the outermost point possible, so we run before any third-party
+        // lightbox (e.g. the JustNews theme) that registers its listener on
+        // document/body. Stopping propagation guarantees the foreign listener
+        // never receives the event, while we still open our own lightbox.
+        function handleTrigger(event) {
+            if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+            var trigger = event.target.closest('.wp-photo-wall-lightbox-trigger');
+            if (!trigger || !$instance[0].contains(trigger)) return;
             event.preventDefault();
             event.stopImmediatePropagation();
-            open($(this).data('index'), this);
-        }).on('keydown', '.wp-photo-wall-lightbox-trigger', function (event) {
-            if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                open($(this).data('index'), this);
-            }
-        });
+            event.stopPropagation();
+            open(parseInt(trigger.getAttribute('data-index'), 10) || 0, trigger);
+        }
+        window.addEventListener('click', handleTrigger, true);
+        window.addEventListener('keydown', handleTrigger, true);
+
         $lightbox.find('.wp-photo-wall-prev').on('click', function () { show(currentIndex - 1); });
         $lightbox.find('.wp-photo-wall-next').on('click', function () { show(currentIndex + 1); });
         $close.add($lightbox.find('.wp-photo-wall-lightbox-overlay')).on('click', close);

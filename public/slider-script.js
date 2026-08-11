@@ -71,8 +71,18 @@
             self.start();
         });
 
-        // Reset timer when a lightbox click happens via keyboard etc.
-        $(this.$slides).find('a').on('click', function () { self.stop(); });
+        // Pause autoplay whenever the user interacts with a slide
+        // (click / Enter / Space). Capture phase so it still fires even though
+        // the lightbox delegation stops propagation in the bubbling phase.
+        var slidesRoot = this.$slides[0];
+        if (slidesRoot) {
+            slidesRoot.addEventListener('click', function (e) {
+                if (e.target.closest('.wp-pw-slide a, .wp-pw-slide button')) self.stop();
+            }, true);
+            slidesRoot.addEventListener('keydown', function (e) {
+                if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.wp-pw-slide a, .wp-pw-slide button')) self.stop();
+            }, true);
+        }
     };
 
     PWSlider.prototype.go = function (dir) {
