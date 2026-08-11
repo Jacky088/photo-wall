@@ -639,7 +639,7 @@ jQuery(document).ready(function ($) {
                 '<span class="wp-pw-slide-handle" title="' + escapeHtml(wp_photo_wall_ajax.labels.drag) + '">&#8942;&#8942;</span>' +
                 '<img class="wp-pw-slide-thumb" src="' + escapeHtml(thumb) + '" alt="">' +
                 '<span class="wp-pw-slide-type">' + escapeHtml(type === 'local' ? wp_photo_wall_ajax.labels.local : wp_photo_wall_ajax.labels.external) + '</span>' +
-                '<button type="button" class="button-link wp-pw-slide-remove" aria-label="' + escapeHtml(wp_photo_wall_ajax.labels.remove) + '">&times;</button>' +
+                '<button type="button" class="button-link wp-pw-slide-remove" aria-label="' + escapeHtml(wp_photo_wall_ajax.labels.remove) + '"></button>' +
                 '</li>';
         });
         $slidesList.html(html);

@@ -71,7 +71,7 @@ if (!defined('ABSPATH')) exit;
                         <span class="wp-pw-slide-handle" title="<?php echo esc_attr(wp_photo_wall_text('drag')); ?>">&#8942;&#8942;</span>
                         <img class="wp-pw-slide-thumb" src="<?php echo esc_url($thumb); ?>" alt="">
                         <span class="wp-pw-slide-type"><?php echo esc_html($type === 'local' ? wp_photo_wall_text('local') : wp_photo_wall_text('external')); ?></span>
-                        <button type="button" class="button-link wp-pw-slide-remove" aria-label="<?php echo esc_attr(wp_photo_wall_text('remove')); ?>">&times;</button>
+                        <button type="button" class="button-link wp-pw-slide-remove" aria-label="<?php echo esc_attr(wp_photo_wall_text('remove')); ?>"></button>
                     </li>
                     <?php
                 }
