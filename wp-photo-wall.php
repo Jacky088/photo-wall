@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 照片墙插件
  * Description: A minimalist, Apple-inspired photo wall plugin with admin management.
- * Version: 2.0.3
+ * Version: 2.1.0
  * Author: 木木
  * Text Domain: wp-photo-wall
  * Requires at least: 6.0
@@ -16,13 +16,14 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('WP_PHOTO_WALL_PATH', plugin_dir_path(__FILE__));
 define('WP_PHOTO_WALL_URL', plugin_dir_url(__FILE__));
-define('WP_PHOTO_WALL_VERSION', '2.0.3');
+define('WP_PHOTO_WALL_VERSION', '2.1.0');
 
 // Load modules
 require_once WP_PHOTO_WALL_PATH . 'includes/i18n.php';
 require_once WP_PHOTO_WALL_PATH . 'includes/data.php';
 require_once WP_PHOTO_WALL_PATH . 'includes/ajax.php';
 require_once WP_PHOTO_WALL_PATH . 'includes/frontend.php';
+require_once WP_PHOTO_WALL_PATH . 'includes/slides.php';
 
 /**
  * Enqueue Admin Scripts and Styles
@@ -71,6 +72,12 @@ function wp_photo_wall_admin_enqueue($hook)
             'save_reminder' => wp_photo_wall_text('save_reminder'),
             'unsaved_changes' => wp_photo_wall_text('unsaved_changes'),
             'move_selected' => wp_photo_wall_text('move_selected'),
+            'drag' => wp_photo_wall_text('drag'),
+            'remove' => wp_photo_wall_text('remove'),
+            'slides_add_local' => wp_photo_wall_text('slides_add_local'),
+            'slides_add_external' => wp_photo_wall_text('slides_add_external'),
+            'add_to_wall' => wp_photo_wall_text('add_to_wall'),
+            'image_url' => wp_photo_wall_text('image_url'),
         )
     ));
 
@@ -149,6 +156,30 @@ function wp_photo_wall_render_admin_page()
                     if (isset($_POST['wp_photo_wall_download_link'])) {
                         $download_link = esc_url_raw(wp_unslash($_POST['wp_photo_wall_download_link']), array('http', 'https'));
                         update_option('wp_photo_wall_download_link', $download_link);
+                    }
+                }
+
+                // Save top banner carousel settings + selected slides.
+                if (isset($_POST['submit'])) {
+                    update_option(WP_PHOTO_WALL_SLIDES_ENABLED_OPTION, isset($_POST['photo_wall_slides_enabled']) ? '1' : '0');
+
+                    $interval = isset($_POST['photo_wall_slides_interval']) ? (int) $_POST['photo_wall_slides_interval'] : 5;
+                    if ($interval < 2) {
+                        $interval = 2;
+                    } elseif ($interval > 30) {
+                        $interval = 30;
+                    }
+                    update_option(WP_PHOTO_WALL_SLIDES_INTERVAL_OPTION, $interval);
+
+                    update_option(WP_PHOTO_WALL_SLIDES_LINK_OPTION, isset($_POST['photo_wall_slides_link']) ? '1' : '0');
+
+                    if (isset($_POST['photo_wall_slides'])) {
+                        $slides_raw = json_decode(wp_unslash($_POST['photo_wall_slides']), true);
+                        if (is_array($slides_raw)) {
+                            wp_photo_wall_save_slides($slides_raw);
+                        }
+                    } else {
+                        wp_photo_wall_save_slides(array());
                     }
                 }
 

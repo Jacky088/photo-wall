@@ -14,6 +14,9 @@ $initial_groups = wp_photo_wall_get_groups();
         <?php wp_nonce_field('wp_photo_wall_save', 'wp_photo_wall_nonce'); ?>
         <input type="hidden" name="photo_wall_data" id="photo_wall_data" value="<?php echo esc_attr(wp_json_encode($initial_data)); ?>">
         <input type="hidden" name="photo_wall_groups" id="photo_wall_groups" value="<?php echo esc_attr(wp_json_encode($initial_groups)); ?>">
+        <input type="hidden" name="photo_wall_slides" id="photo_wall_slides" value="<?php echo esc_attr(wp_json_encode(wp_photo_wall_get_slides())); ?>">
+
+        <?php include WP_PHOTO_WALL_PATH . 'admin/admin-slides.php'; ?>
 
         <div class="card wp-photo-wall-admin-card">
             <h2><?php echo esc_html(wp_photo_wall_text('manage_photos')); ?></h2>

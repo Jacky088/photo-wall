@@ -1,0 +1,141 @@
+/* ============================================================
+   WP Photo Wall - Top Banner Carousel (slides)
+   Independent from the photo wall gallery styles.
+   ============================================================ */
+
+.wp-photo-wall-slider {
+    position: relative;
+    width: 100%;
+    margin: 0 0 28px;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #f2f2f4;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
+    /* Reserve aspect ratio to avoid layout shift before images load */
+    aspect-ratio: 21 / 9;
+}
+
+.wp-pw-track {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    transition: transform 600ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: transform;
+}
+
+.wp-pw-slide {
+    position: relative;
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+}
+
+.wp-pw-slide img,
+.wp-pw-slide a img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    min-width: 100%;
+    min-height: 100%;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.wp-pw-slide a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: zoom-in;
+}
+
+/* Navigation arrows */
+.wp-pw-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    color: #1d1d1f;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    transition: opacity 0.25s ease, background 0.25s ease;
+    z-index: 3;
+}
+
+.wp-photo-wall-slider:hover .wp-pw-nav {
+    opacity: 1;
+}
+
+.wp-pw-nav:hover {
+    background: #fff;
+}
+
+.wp-pw-prev {
+    left: 14px;
+}
+
+.wp-pw-next {
+    right: 14px;
+}
+
+/* Dots */
+.wp-pw-dots {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 3;
+}
+
+.wp-pw-dot {
+    width: 9px;
+    height: 9px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.wp-pw-dot.is-active {
+    background: #fff;
+    transform: scale(1.25);
+}
+
+/* Pause-on-hover affordance */
+.wp-photo-wall-slider:hover .wp-pw-dots {
+    background: transparent;
+}
+
+@media (max-width: 600px) {
+    .wp-photo-wall-slider {
+        aspect-ratio: 16 / 9;
+        border-radius: 10px;
+    }
+
+    .wp-pw-nav {
+        width: 34px;
+        height: 34px;
+        font-size: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wp-pw-track {
+        transition: none;
+    }
+}

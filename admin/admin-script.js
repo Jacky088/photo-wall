@@ -599,4 +599,145 @@ jQuery(document).ready(function ($) {
         }
     });
 
+    // ==========================================
+    // Top Banner Carousel (slides) management
+    // ==========================================
+    var $slidesInput = $('#photo_wall_slides');
+    var $slidesList = $('#wp-pw-slides-list');
+    var slidesFrame;
+
+    function getSlides() {
+        try {
+            var raw = $slidesInput.val();
+            if (!raw) return [];
+            var parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function setSlides(slides) {
+        $slidesInput.val(JSON.stringify(slides));
+        markDirty();
+    }
+
+    function renderSlides() {
+        var slides = getSlides();
+        var html = '';
+        slides.forEach(function (s) {
+            var type = s.type === 'local' ? 'local' : 'external';
+            var id = s.type === 'local' ? s.id : 'external';
+            var url = s.url || '';
+            var full = s.full || url;
+            var thumb = type === 'local' ? (s.thumb_url || url) : url;
+            html += '<li class="wp-pw-slide-item" data-type="' + type + '"' +
+                ' data-id="' + id + '"' +
+                ' data-url="' + escapeHtml(url) + '"' +
+                ' data-full="' + escapeHtml(full) + '"' +
+                ' data-thumb="' + escapeHtml(thumb) + '">' +
+                '<span class="wp-pw-slide-handle" title="' + escapeHtml(wp_photo_wall_ajax.labels.drag) + '">&#8942;&#8942;</span>' +
+                '<img class="wp-pw-slide-thumb" src="' + escapeHtml(thumb) + '" alt="">' +
+                '<span class="wp-pw-slide-type">' + escapeHtml(type === 'local' ? wp_photo_wall_ajax.labels.local : wp_photo_wall_ajax.labels.external) + '</span>' +
+                '<button type="button" class="button-link wp-pw-slide-remove" aria-label="' + escapeHtml(wp_photo_wall_ajax.labels.remove) + '">&times;</button>' +
+                '</li>';
+        });
+        $slidesList.html(html);
+    }
+
+    // Init sortable for slides list
+    function initSlidesSortable() {
+        if ($.fn.sortable) {
+            $slidesList.sortable({
+                handle: '.wp-pw-slide-handle',
+                placeholder: 'wp-pw-slide-placeholder',
+                forcePlaceholderSize: true,
+                tolerance: 'pointer',
+                update: function () {
+                    syncSlidesFromDOM();
+                    markDirty();
+                }
+            }).disableSelection();
+        }
+    }
+
+    function syncSlidesFromDOM() {
+        var slides = [];
+        $slidesList.find('.wp-pw-slide-item').each(function () {
+            var $li = $(this);
+            var type = $li.data('type');
+            var slide = { type: type, url: $li.data('url'), full: $li.data('full') };
+            if (type === 'local') {
+                slide.id = parseInt($li.data('id'), 10) || 0;
+            }
+            slides.push(slide);
+        });
+        setSlides(slides);
+    }
+
+    // Add from Media Library
+    $(document).on('click', '.wp-pw-add-local', function (e) {
+        e.preventDefault();
+        if (typeof wp === 'undefined' || !wp.media) {
+            alert('WordPress Media Library is not available.');
+            return;
+        }
+        if (slidesFrame) { slidesFrame.open(); return; }
+        slidesFrame = wp.media({
+            title: wp_photo_wall_ajax.labels.slides_add_local,
+            button: { text: wp_photo_wall_ajax.labels.add_to_wall },
+            multiple: true
+        });
+        slidesFrame.on('select', function () {
+            var selection = slidesFrame.state().get('selection');
+            selection.map(function (attachment) {
+                attachment = attachment.toJSON();
+                var thumbUrl = '';
+                if (attachment.sizes) {
+                    if (attachment.sizes.thumbnail) thumbUrl = attachment.sizes.thumbnail.url;
+                    else if (attachment.sizes.medium) thumbUrl = attachment.sizes.medium.url;
+                    else thumbUrl = attachment.url;
+                } else {
+                    thumbUrl = attachment.url;
+                }
+                var slides = getSlides();
+                slides.push({ type: 'local', id: attachment.id, url: thumbUrl, full: attachment.url, thumb_url: thumbUrl });
+                setSlides(slides);
+            });
+            renderSlides();
+            initSlidesSortable();
+        });
+        slidesFrame.open();
+    });
+
+    // Add external link
+    var $slideExternalUrl = '';
+    var slideExternalPreview = null;
+    $(document).on('click', '.wp-pw-add-external', function (e) {
+        e.preventDefault();
+        var url = prompt(wp_photo_wall_ajax.labels.image_url + ' (https://...):');
+        if (!url) return;
+        url = url.trim();
+        if (!/^https?:\/\/.+/i.test(url)) {
+            alert(wp_photo_wall_ajax.labels.invalid_url);
+            return;
+        }
+        var slides = getSlides();
+        slides.push({ type: 'external', id: 'external', url: url, full: url });
+        setSlides(slides);
+        renderSlides();
+        initSlidesSortable();
+    });
+
+    // Remove slide
+    $(document).on('click', '.wp-pw-slide-remove', function (e) {
+        e.preventDefault();
+        $(this).closest('.wp-pw-slide-item').remove();
+        syncSlidesFromDOM();
+    });
+
+    // Initial render + sortable
+    renderSlides();
+    initSlidesSortable();
+
 });

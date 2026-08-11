@@ -10,6 +10,7 @@ $last_gid = null;
 $open = false;
 ?>
 <section id="<?php echo esc_attr($instance_id); ?>" class="wp-photo-wall-instance" data-page="1">
+    <?php echo wp_photo_wall_render_slider($instance_id); ?>
     <div class="wp-photo-wall-wrapper">
     <?php foreach ($batch as $index => $item) :
         $gid = $item['group_id'];

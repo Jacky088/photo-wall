@@ -355,6 +355,103 @@ function wp_photo_wall_text($key)
             'zh_CN' => '设置',
             'zh_TW' => '設定'
         ),
+
+        // Top banner carousel (slides)
+        'slides_title' => array(
+            'en' => 'Top Banner Carousel',
+            'zh_CN' => '顶部海报轮播',
+            'zh_TW' => '頂部海報輪播'
+        ),
+        'slides_desc' => array(
+            'en' => 'Manually selected images shown as an auto-playing carousel at the top of each [photo_wall]. Supports local media library images and external links.',
+            'zh_CN' => '在每个 [photo_wall] 顶部展示的自动轮播海报。支持本地媒体库图片和外部链接图片。',
+            'zh_TW' => '在每個 [photo_wall] 頂部展示的自動輪播海報。支持本地媒體庫圖片和外部鏈接圖片。'
+        ),
+        'slides_enable' => array(
+            'en' => 'Enable Carousel',
+            'zh_CN' => '启用轮播',
+            'zh_TW' => '啟用輪播'
+        ),
+        'slides_enable_label' => array(
+            'en' => 'Show the banner carousel above the photo wall',
+            'zh_CN' => '在照片墙上方显示海报轮播',
+            'zh_TW' => '在照片牆上方顯示海報輪播'
+        ),
+        'slides_interval' => array(
+            'en' => 'Auto-play Interval',
+            'zh_CN' => '轮播间隔',
+            'zh_TW' => '輪播間隔'
+        ),
+        'seconds' => array(
+            'en' => 'seconds',
+            'zh_CN' => '秒',
+            'zh_TW' => '秒'
+        ),
+        'slides_link' => array(
+            'en' => 'Open in Lightbox',
+            'zh_CN' => '点击打开灯箱',
+            'zh_TW' => '點擊打開燈箱'
+        ),
+        'slides_link_label' => array(
+            'en' => 'Clicking a slide opens the full image in the lightbox',
+            'zh_CN' => '点击轮播图在灯箱中查看大图',
+            'zh_TW' => '點擊輪播圖在燈箱中查看大圖'
+        ),
+        'slides_add_local' => array(
+            'en' => 'Add from Media Library',
+            'zh_CN' => '从媒体库添加',
+            'zh_TW' => '從媒體庫添加'
+        ),
+        'slides_add_external' => array(
+            'en' => 'Add External Link',
+            'zh_CN' => '添加外部链接',
+            'zh_TW' => '添加外部鏈接'
+        ),
+        'slides_order_hint' => array(
+            'en' => 'Drag to reorder. Order is saved when you click "Save Changes".',
+            'zh_CN' => '拖拽可排序，点击"保存更改"后生效。',
+            'zh_TW' => '拖拽可排序，點擊「儲存變更」後生效。'
+        ),
+        'drag' => array(
+            'en' => 'Drag to reorder',
+            'zh_CN' => '拖拽排序',
+            'zh_TW' => '拖拽排序'
+        ),
+        'local' => array(
+            'en' => 'Local',
+            'zh_CN' => '本地',
+            'zh_TW' => '本地'
+        ),
+        'external' => array(
+            'en' => 'External',
+            'zh_CN' => '外部',
+            'zh_TW' => '外部'
+        ),
+        'remove' => array(
+            'en' => 'Remove',
+            'zh_CN' => '移除',
+            'zh_TW' => '移除'
+        ),
+        'previous' => array(
+            'en' => 'Previous',
+            'zh_CN' => '上一张',
+            'zh_TW' => '上一張'
+        ),
+        'next' => array(
+            'en' => 'Next',
+            'zh_CN' => '下一张',
+            'zh_TW' => '下一張'
+        ),
+        'add_to_wall' => array(
+            'en' => 'Add to Carousel',
+            'zh_CN' => '添加到轮播',
+            'zh_TW' => '添加到輪播'
+        ),
+        'image_url' => array(
+            'en' => 'Image URL',
+            'zh_CN' => '图片链接',
+            'zh_TW' => '圖片鏈接'
+        ),
     );
 
     if (isset($texts[$key][$lang])) {
