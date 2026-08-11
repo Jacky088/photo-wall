@@ -40,7 +40,7 @@ function wp_photo_wall_admin_enqueue($hook)
         'wp-photo-wall-admin',
         WP_PHOTO_WALL_URL . 'admin/admin-script.js',
         array('jquery', 'jquery-ui-sortable'),
-        WP_PHOTO_WALL_VERSION,
+        filemtime(WP_PHOTO_WALL_PATH . 'admin/admin-script.js'),
         true
     );
 
@@ -85,7 +85,7 @@ function wp_photo_wall_admin_enqueue($hook)
         'wp-photo-wall-admin-css',
         WP_PHOTO_WALL_URL . 'admin/admin-style.css',
         array(),
-        WP_PHOTO_WALL_VERSION
+        filemtime(WP_PHOTO_WALL_PATH . 'admin/admin-style.css')
     );
 }
 add_action('admin_enqueue_scripts', 'wp_photo_wall_admin_enqueue');

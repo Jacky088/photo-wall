@@ -16,14 +16,14 @@ function wp_photo_wall_public_enqueue()
         'wp-photo-wall-css',
         WP_PHOTO_WALL_URL . 'public/gallery-style.css',
         array(),
-        WP_PHOTO_WALL_VERSION
+        filemtime(WP_PHOTO_WALL_PATH . 'public/gallery-style.css')
     );
 
     wp_enqueue_script(
         'wp-photo-wall-js',
         WP_PHOTO_WALL_URL . 'public/gallery-script.js',
         array('jquery'),
-        WP_PHOTO_WALL_VERSION,
+        filemtime(WP_PHOTO_WALL_PATH . 'public/gallery-script.js'),
         true
     );
 
@@ -51,7 +51,7 @@ function wp_photo_wall_public_enqueue()
             'wp-photo-wall-slider-js',
             WP_PHOTO_WALL_URL . 'public/slider-script.js',
             array('jquery'),
-            WP_PHOTO_WALL_VERSION,
+            filemtime(WP_PHOTO_WALL_PATH . 'public/slider-script.js'),
             true
         );
 
