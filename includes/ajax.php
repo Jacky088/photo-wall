@@ -77,7 +77,7 @@ function wp_photo_wall_ajax_delete_image()
             }
         }
 
-        update_option('photo_wall_data', wp_json_encode($new_data));
+        update_option('photo_wall_data', wp_json_encode($new_data), false);
 
         $legacy_ids = array();
         foreach ($new_data as $item) {
@@ -85,7 +85,7 @@ function wp_photo_wall_ajax_delete_image()
                 $legacy_ids[] = $item['id'];
             }
         }
-        update_option('photo_wall_ids', implode(',', $legacy_ids));
+        update_option('photo_wall_ids', implode(',', $legacy_ids), false);
 
         $msg = sprintf(wp_photo_wall_text('success_delete'), $deleted_count);
         wp_send_json_success($msg);
@@ -108,75 +108,19 @@ function wp_photo_wall_ajax_load_more()
     $page = isset($_POST['page']) ? max(1, min(10000, intval($_POST['page']))) : 1;
     $per_page = 12;
 
-    $json_data = get_option('photo_wall_data', '');
-    $data_array = array();
-    if (!empty($json_data)) {
-        $decoded = json_decode($json_data, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-            $data_array = $decoded;
-        }
-    }
+    // Reuse the shared data layer so grouping/sorting stays in sync with the
+    // initial shortcode render. Uncategorized items are excluded by
+    // wp_photo_wall_get_visible_items().
+    $all_items = wp_photo_wall_get_visible_items();
 
-    // Fallback/Legacy
-    if (empty($data_array)) {
-        $ids_string = get_option('photo_wall_ids', '');
-        if (!empty($ids_string)) {
-            $ids = explode(',', $ids_string);
-            foreach ($ids as $id) {
-                if ($id)
-                    $data_array[] = array('type' => 'local', 'id' => intval($id));
-            }
-        }
-    }
-
-    if (empty($data_array)) {
+    if (empty($all_items)) {
         wp_send_json_error(wp_photo_wall_text('no_images_found'));
     }
 
-    // Get Groups
-    $groups_json = get_option('photo_wall_groups', '[]');
-    $groups_map = array();
-    $groups_order = array();
-
-    if (!empty($groups_json)) {
-        $decoded_groups = json_decode($groups_json, true);
-        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded_groups)) {
-            foreach ($decoded_groups as $g) {
-                $groups_map[$g['id']] = $g['name'];
-                $groups_order[] = $g['id'];
-            }
-        }
-    }
-    $groups_map['uncategorized'] = wp_photo_wall_text('uncategorized');
-
-    // Group Items (exclude uncategorized from frontend)
-    $grouped_items = array();
-    foreach ($data_array as $item) {
-        $gid = isset($item['group_id']) ? $item['group_id'] : 'uncategorized';
-        if ($gid !== 'uncategorized' && !isset($groups_map[$gid])) {
-            $gid = 'uncategorized';
-        }
-        if (!isset($grouped_items[$gid])) {
-            $grouped_items[$gid] = array();
-        }
-        $grouped_items[$gid][] = $item;
-    }
-
-    // Flatten Sorted (respecting group order)
-    $sorted_data = array();
-    foreach ($groups_order as $gid) {
-        if (isset($grouped_items[$gid])) {
-            foreach ($grouped_items[$gid] as $item) {
-                $item['group_id'] = $gid;
-                $sorted_data[] = $item;
-            }
-        }
-    }
-
-    $total_images = count($sorted_data);
-    $total_pages = ceil($total_images / $per_page);
+    $total_images = count($all_items);
+    $total_pages = (int) ceil($total_images / $per_page);
     $offset = ($page - 1) * $per_page;
-    $current_batch = array_slice($sorted_data, $offset, $per_page);
+    $current_batch = array_slice($all_items, $offset, $per_page);
 
     if (empty($current_batch)) {
         wp_send_json_success(array(
@@ -198,7 +142,7 @@ function wp_photo_wall_ajax_load_more()
                 echo '</div></div>';
             }
             echo '<div class="wp-photo-wall-group-section" data-group-id="' . esc_attr($current_gid) . '">';
-            echo '<h3 class="wp-photo-wall-group-title">' . esc_html($groups_map[$current_gid]) . '</h3>';
+            echo '<h3 class="wp-photo-wall-group-title">' . esc_html($item['group_name']) . '</h3>';
             echo '<div class="wp-photo-wall-group-grid">';
             $open_container = true;
             $last_gid = $current_gid;

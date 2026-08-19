@@ -9,16 +9,19 @@ if (!defined('ABSPATH')) exit;
 
 function wp_photo_wall_text($key)
 {
-    $locale = get_locale();
-    $lang = 'en';
+    static $texts = null, $lang = null;
 
-    if (strpos($locale, 'zh_CN') === 0) {
-        $lang = 'zh_CN';
-    } elseif (strpos($locale, 'zh_TW') === 0 || strpos($locale, 'zh_HK') === 0) {
-        $lang = 'zh_TW';
-    }
+    if ($texts === null) {
+        $locale = get_locale();
+        $lang = 'en';
 
-    $texts = array(
+        if (strpos($locale, 'zh_CN') === 0) {
+            $lang = 'zh_CN';
+        } elseif (strpos($locale, 'zh_TW') === 0 || strpos($locale, 'zh_HK') === 0) {
+            $lang = 'zh_TW';
+        }
+
+        $texts = array(
         // General
         'photo_wall_settings' => array(
             'en' => 'Photo Wall Settings',
@@ -72,7 +75,7 @@ function wp_photo_wall_text($key)
         ),
         'preview_drag_group' => array(
             'en' => 'Drag and drop to reorder or move between groups',
-            'zh_CN' => '拖拽排序或移动到通过分组',
+            'zh_CN' => '拖拽排序或移动到其他分组',
             'zh_TW' => '拖拽排序或移動到通過分組'
         ),
         'manage_groups' => array(
@@ -166,6 +169,11 @@ function wp_photo_wall_text($key)
             'en' => 'Add to Wall',
             'zh_CN' => '添加',
             'zh_TW' => '添加'
+        ),
+        'image_url' => array(
+            'en' => 'Image URL',
+            'zh_CN' => '图片链接',
+            'zh_TW' => '圖片鏈接'
         ),
 
         // AJAX / JS Labels
@@ -442,17 +450,14 @@ function wp_photo_wall_text($key)
             'zh_CN' => '下一张',
             'zh_TW' => '下一張'
         ),
-        'add_to_wall' => array(
+        'slides_add_to_carousel' => array(
             'en' => 'Add to Carousel',
             'zh_CN' => '添加到轮播',
             'zh_TW' => '添加到輪播'
         ),
-        'image_url' => array(
-            'en' => 'Image URL',
-            'zh_CN' => '图片链接',
-            'zh_TW' => '圖片鏈接'
-        ),
     );
+
+    }
 
     if (isset($texts[$key][$lang])) {
         return $texts[$key][$lang];

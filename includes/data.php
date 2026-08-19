@@ -52,13 +52,23 @@ function wp_photo_wall_get_groups()
     return wp_photo_wall_sanitize_groups($groups);
 }
 
-function wp_photo_wall_get_items()
+/**
+ * Get sanitized items. Pass an already-loaded groups list to avoid fetching
+ * groups a second time (e.g. inside get_visible_items()).
+ *
+ * @param array|null $groups  Sanitized groups from wp_photo_wall_get_groups().
+ * @return array
+ */
+function wp_photo_wall_get_items($groups = null)
 {
+    if ($groups === null) {
+        $groups = wp_photo_wall_get_groups();
+    }
     $items = json_decode((string) get_option('photo_wall_data', '[]'), true);
     if (!is_array($items) || !$items) {
         $items = array_filter(array_map('absint', explode(',', (string) get_option('photo_wall_ids', ''))));
     }
-    return wp_photo_wall_sanitize_items($items, wp_photo_wall_get_groups());
+    return wp_photo_wall_sanitize_items($items, $groups);
 }
 
 /**
@@ -83,8 +93,8 @@ function wp_photo_wall_get_items_with_thumbnails()
 /** Return visible items in group order. Uncategorized is intentionally hidden. */
 function wp_photo_wall_get_visible_items()
 {
-    $items = wp_photo_wall_get_items();
     $groups = wp_photo_wall_get_groups();
+    $items = wp_photo_wall_get_items($groups);
     $by_group = array();
     foreach ($items as $item) $by_group[$item['group_id']][] = $item;
     $visible = array();

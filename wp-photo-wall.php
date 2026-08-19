@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 照片墙插件
  * Description: A minimalist, Apple-inspired photo wall plugin with admin management.
- * Version: 2.1.0
+ * Version: 2.2.0
  * Author: 木木
  * Text Domain: wp-photo-wall
  * Requires at least: 6.0
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('WP_PHOTO_WALL_PATH', plugin_dir_path(__FILE__));
 define('WP_PHOTO_WALL_URL', plugin_dir_url(__FILE__));
-define('WP_PHOTO_WALL_VERSION', '2.1.0');
+define('WP_PHOTO_WALL_VERSION', '2.2.0');
 
 // Load modules
 require_once WP_PHOTO_WALL_PATH . 'includes/i18n.php';
@@ -77,6 +77,7 @@ function wp_photo_wall_admin_enqueue($hook)
             'slides_add_local' => wp_photo_wall_text('slides_add_local'),
             'slides_add_external' => wp_photo_wall_text('slides_add_external'),
             'add_to_wall' => wp_photo_wall_text('add_to_wall'),
+            'slides_add_to_carousel' => wp_photo_wall_text('slides_add_to_carousel'),
             'image_url' => wp_photo_wall_text('image_url'),
         )
     ));
@@ -136,8 +137,8 @@ function wp_photo_wall_render_admin_page()
                 $validated_groups = wp_photo_wall_sanitize_groups($groups_raw);
                 $validated_data = wp_photo_wall_sanitize_items($decoded, $validated_groups);
 
-                update_option('photo_wall_data', wp_json_encode($validated_data));
-                update_option('photo_wall_groups', wp_json_encode($validated_groups));
+                update_option('photo_wall_data', wp_json_encode($validated_data), false);
+                update_option('photo_wall_groups', wp_json_encode($validated_groups), false);
 
                 // Update legacy ID list
                 $local_ids = array();
@@ -146,7 +147,7 @@ function wp_photo_wall_render_admin_page()
                         $local_ids[] = $item['id'];
                     }
                 }
-                update_option('photo_wall_ids', implode(',', $local_ids));
+                update_option('photo_wall_ids', implode(',', $local_ids), false);
 
                 // Save Settings
                 if (isset($_POST['submit'])) {

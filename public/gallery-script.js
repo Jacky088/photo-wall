@@ -30,7 +30,7 @@
             items = [];
             $instance.find('.wp-photo-wall-lightbox-trigger').each(function (index) {
                 items.push($(this).attr('data-full-url'));
-                $(this).attr({ role: 'button', tabindex: '0', 'aria-label': 'Open photo ' + (index + 1) }).data('index', index);
+                $(this).attr({ role: 'button', tabindex: '0', 'aria-label': 'Open photo ' + (index + 1), 'data-index': index });
             });
         }
 
@@ -168,6 +168,23 @@
         $lightbox.find('.wp-photo-wall-prev').on('click', function () { show(currentIndex - 1); });
         $lightbox.find('.wp-photo-wall-next').on('click', function () { show(currentIndex + 1); });
         $close.add($lightbox.find('.wp-photo-wall-lightbox-overlay')).on('click', close);
+
+        // Touch swipe to navigate between photos (mirrors the slider's swipe support)
+        var touchStartX = 0;
+        var touchStartY = 0;
+        $lightbox.on('touchstart', function (e) {
+            touchStartX = e.originalEvent.touches[0].clientX;
+            touchStartY = e.originalEvent.touches[0].clientY;
+        });
+        $lightbox.on('touchend', function (e) {
+            var dx = e.originalEvent.changedTouches[0].clientX - touchStartX;
+            var dy = e.originalEvent.changedTouches[0].clientY - touchStartY;
+            // Only navigate on a horizontal swipe (ignore vertical pans/taps)
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+                show(dx < 0 ? currentIndex + 1 : currentIndex - 1);
+            }
+        });
+
         $lightbox.on('keydown', function (event) {
             if (event.key === 'Escape') close();
             else if (event.key === 'ArrowLeft') show(currentIndex - 1);

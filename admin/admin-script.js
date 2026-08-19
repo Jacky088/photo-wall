@@ -685,7 +685,7 @@ jQuery(document).ready(function ($) {
         if (slidesFrame) { slidesFrame.open(); return; }
         slidesFrame = wp.media({
             title: wp_photo_wall_ajax.labels.slides_add_local,
-            button: { text: wp_photo_wall_ajax.labels.add_to_wall },
+            button: { text: wp_photo_wall_ajax.labels.slides_add_to_carousel },
             multiple: true
         });
         slidesFrame.on('select', function () {

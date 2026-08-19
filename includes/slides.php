@@ -76,7 +76,7 @@ function wp_photo_wall_save_slides($raw) {
         }
     }
 
-    update_option(WP_PHOTO_WALL_SLIDES_OPTION, $slides);
+    update_option(WP_PHOTO_WALL_SLIDES_OPTION, $slides, false);
     return true;
 }
 
