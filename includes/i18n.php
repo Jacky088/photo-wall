@@ -455,6 +455,28 @@ function wp_photo_wall_text($key)
             'zh_CN' => '添加到轮播',
             'zh_TW' => '添加到輪播'
         ),
+
+        // Orphan media cleanup (delete media library images no longer used by the plugin)
+        'auto_delete_orphans' => array(
+            'en' => 'Auto-delete unused media',
+            'zh_CN' => '自动删除无用媒体',
+            'zh_TW' => '自動刪除無用媒體'
+        ),
+        'auto_delete_orphans_desc' => array(
+            'en' => 'When enabled, removing a Media Library image from the photo wall (or banner carousel) also permanently deletes it from the Media Library if it is no longer used anywhere by this plugin. Prevents orphaned files from accumulating.',
+            'zh_CN' => '启用后,从照片墙(或顶部轮播)移除媒体库图片时,若该图片已不被本插件任何位置引用,将同时从媒体库永久删除,避免产生孤儿图片。',
+            'zh_TW' => '啟用後,從照片牆(或頂部輪播)移除媒體庫圖片時,若該圖片已不被本插件任何位置引用,將同時從媒體庫永久刪除,避免產生孤兒圖片。'
+        ),
+        'orphan_cleanup_done' => array(
+            'en' => 'Settings saved. %d unused media file(s) were also deleted from the Media Library.',
+            'zh_CN' => '设置已保存,并自动清理了 %d 个媒体库孤儿图片。',
+            'zh_TW' => '設定已保存,並自動清理了 %d 個媒體庫孤兒圖片。'
+        ),
+        'orphan_cleanup_none' => array(
+            'en' => 'Settings saved. No unused media files needed cleanup.',
+            'zh_CN' => '设置已保存,没有需要清理的孤儿图片。',
+            'zh_TW' => '設定已保存,沒有需要清理的孤兒圖片。'
+        ),
     );
 
     }

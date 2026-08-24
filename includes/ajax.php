@@ -87,6 +87,24 @@ function wp_photo_wall_ajax_delete_image()
         }
         update_option('photo_wall_ids', implode(',', $legacy_ids), false);
 
+        // Keep the top banner carousel in sync: drop any slide that referenced
+        // a deleted attachment so we never leave a dangling reference behind.
+        if (defined('WP_PHOTO_WALL_SLIDES_OPTION')) {
+            $slides = get_option(WP_PHOTO_WALL_SLIDES_OPTION, array());
+            if (is_array($slides) && !empty($slides)) {
+                $cleaned_slides = array();
+                foreach ($slides as $slide) {
+                    if (is_array($slide) && isset($slide['type']) && $slide['type'] === 'local' && in_array((int) $slide['id'], $attachment_ids, true)) {
+                        continue;
+                    }
+                    $cleaned_slides[] = $slide;
+                }
+                if (count($cleaned_slides) !== count($slides)) {
+                    update_option(WP_PHOTO_WALL_SLIDES_OPTION, $cleaned_slides, false);
+                }
+            }
+        }
+
         $msg = sprintf(wp_photo_wall_text('success_delete'), $deleted_count);
         wp_send_json_success($msg);
     } else {

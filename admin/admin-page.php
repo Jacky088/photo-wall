@@ -48,6 +48,8 @@ $initial_groups = wp_photo_wall_get_groups();
             <p><label><input type="checkbox" name="wp_photo_wall_enable_lightbox" value="1" <?php checked(get_option('wp_photo_wall_enable_lightbox', '1'), '1'); ?>> <?php echo esc_html(wp_photo_wall_text('enable_lightbox')); ?></label></p>
             <p><label for="wp_photo_wall_download_link"><?php echo esc_html(wp_photo_wall_text('download_button_link')); ?></label><br>
                 <input class="regular-text" type="url" name="wp_photo_wall_download_link" id="wp_photo_wall_download_link" value="<?php echo esc_attr(get_option('wp_photo_wall_download_link', '')); ?>" placeholder="https://"></p>
+            <p><label><input type="checkbox" name="wp_photo_wall_auto_delete_orphans" value="1" <?php checked(get_option('wp_photo_wall_auto_delete_orphans', '1'), '1'); ?>> <?php echo esc_html(wp_photo_wall_text('auto_delete_orphans')); ?></label><br>
+                <span class="description"><?php echo esc_html(wp_photo_wall_text('auto_delete_orphans_desc')); ?></span></p>
             <div class="wp-photo-wall-save-area">
                 <?php submit_button(wp_photo_wall_text('save_changes'), 'primary', 'submit', false); ?>
             </div>

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 照片墙插件
  * Description: A minimalist, Apple-inspired photo wall plugin with admin management.
- * Version: 2.2.0
+ * Version: 2.3.0
  * Author: 木木
  * Text Domain: wp-photo-wall
  * Requires at least: 6.0
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('WP_PHOTO_WALL_PATH', plugin_dir_path(__FILE__));
 define('WP_PHOTO_WALL_URL', plugin_dir_url(__FILE__));
-define('WP_PHOTO_WALL_VERSION', '2.2.0');
+define('WP_PHOTO_WALL_VERSION', '2.3.0');
 
 // Load modules
 require_once WP_PHOTO_WALL_PATH . 'includes/i18n.php';
@@ -137,16 +137,17 @@ function wp_photo_wall_render_admin_page()
                 $validated_groups = wp_photo_wall_sanitize_groups($groups_raw);
                 $validated_data = wp_photo_wall_sanitize_items($decoded, $validated_groups);
 
+                // Orphan prevention: capture which media library attachments the
+                // plugin referenced BEFORE this save (wall + banner carousel).
+                $old_wall_ids    = wp_photo_wall_collect_local_ids(wp_photo_wall_get_items($validated_groups));
+                $old_slides_ids  = wp_photo_wall_get_slides_local_ids();
+                $old_referenced  = array_merge($old_wall_ids, $old_slides_ids);
+
                 update_option('photo_wall_data', wp_json_encode($validated_data), false);
                 update_option('photo_wall_groups', wp_json_encode($validated_groups), false);
 
                 // Update legacy ID list
-                $local_ids = array();
-                foreach ($validated_data as $item) {
-                    if (isset($item['type']) && $item['type'] === 'local') {
-                        $local_ids[] = $item['id'];
-                    }
-                }
+                $local_ids = wp_photo_wall_collect_local_ids($validated_data);
                 update_option('photo_wall_ids', implode(',', $local_ids), false);
 
                 // Save Settings
@@ -158,6 +159,12 @@ function wp_photo_wall_render_admin_page()
                         $download_link = esc_url_raw(wp_unslash($_POST['wp_photo_wall_download_link']), array('http', 'https'));
                         update_option('wp_photo_wall_download_link', $download_link);
                     }
+                }
+
+                // Orphan prevention setting.
+                if (isset($_POST['submit'])) {
+                    $auto_delete = isset($_POST['wp_photo_wall_auto_delete_orphans']) ? '1' : '0';
+                    update_option('wp_photo_wall_auto_delete_orphans', $auto_delete);
                 }
 
                 // Save top banner carousel settings + selected slides.
@@ -184,7 +191,23 @@ function wp_photo_wall_render_admin_page()
                     }
                 }
 
-                $msg = wp_photo_wall_text('settings_saved');
+                // Orphan prevention: after saving the new state, delete media
+                // library attachments that dropped out of every reference.
+                $auto_delete_enabled = get_option('wp_photo_wall_auto_delete_orphans', '1') === '1';
+                $orphan_deleted = 0;
+                if ($auto_delete_enabled) {
+                    $new_wall_ids   = $local_ids;
+                    $new_slides_ids = wp_photo_wall_get_slides_local_ids();
+                    $new_referenced = array_merge($new_wall_ids, $new_slides_ids);
+
+                    $orphan_deleted = wp_photo_wall_delete_orphaned_attachments($old_referenced, $new_referenced);
+                }
+
+                if ($orphan_deleted > 0) {
+                    $msg = sprintf(wp_photo_wall_text('orphan_cleanup_done'), $orphan_deleted);
+                } else {
+                    $msg = wp_photo_wall_text('orphan_cleanup_none');
+                }
                 echo '<div class="notice notice-success is-dismissible"><p>' . esc_html($msg) . '</p></div>';
             } else {
                 echo '<div class="notice notice-error is-dismissible"><p>' . esc_html(wp_photo_wall_text('json_error')) . '</p></div>';

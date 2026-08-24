@@ -6,6 +6,7 @@ delete_option('photo_wall_groups');
 delete_option('photo_wall_ids');
 delete_option('wp_photo_wall_enable_lightbox');
 delete_option('wp_photo_wall_download_link');
+delete_option('wp_photo_wall_auto_delete_orphans');
 
 // Top banner carousel options (added in 2.1.0)
 delete_option('photo_wall_slides');
