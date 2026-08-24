@@ -125,16 +125,8 @@ photo-wall/
 ## 🔄 更新日志
 
 ### 2.3.0
-- **新增**：孤儿图片自动清理 —— 从照片墙或顶部轮播移除媒体库图片时，若该图片已不被插件任何位置引用，自动从媒体库永久删除，避免孤儿文件堆积。
-    - 统一引用快照机制：保存前后对比"照片墙 + 顶部轮播"两处引用集合的差集，精准识别孤儿。
-    - 覆盖移除选中、清空全部、批量永久删除、轮播删图等所有移除路径。
-    - 新增设置开关"自动删除无用媒体"（默认开启，可在设置区关闭）。
-    - 批量永久删除时同步清理轮播中的悬空引用，避免残留失效项。
-    - 仅作用于真实图片附件，逐项校验 `wp_attachment_is_image` 与 `delete_post` 权限；外链图片不涉及媒体库，完全跳过。
-- **新增**：`includes/data.php` 工具函数 `wp_photo_wall_collect_local_ids`、`wp_photo_wall_get_slides_local_ids`、`wp_photo_wall_delete_orphaned_attachments`。
-- **新增**：中英繁三语文案 `auto_delete_orphans` / `auto_delete_orphans_desc` / `orphan_cleanup_done` / `orphan_cleanup_none`。
-- **维护**：`uninstall.php` 卸载时一并清理新增的 `wp_photo_wall_auto_delete_orphans` option。
-- **维护**：主文件与 README 版本号同步升级至 2.3.0。
+- **新增**：孤儿图片自动清理 —— 仅作用于真实图片附件，外链图片不涉及媒体库，完全跳过
+- **新增**：中英繁三语文案 
 
 ### 2.2.0
 - **修复**：灯箱点击图片后始终打开第一张的问题（`data-index` 读写方式不一致导致索引丢失）
