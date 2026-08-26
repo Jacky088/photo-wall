@@ -139,7 +139,7 @@
 
 @media (max-width: 600px) {
     .wp-photo-wall-slider {
-        aspect-ratio: 16 / 9;
+        aspect-ratio: 28 / 9;
         border-radius: 10px;
     }
 

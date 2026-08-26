@@ -39,12 +39,11 @@ function wp_photo_wall_public_enqueue()
 
     // Top banner carousel assets - only when enabled and slides exist.
     if (wp_photo_wall_slides_enabled() && !empty(wp_photo_wall_get_slides())) {
-        $slider_ver = WP_PHOTO_WALL_VERSION . '.' . filemtime(WP_PHOTO_WALL_PATH . 'public/slider-style.css');
         wp_enqueue_style(
             'wp-photo-wall-slider-css',
             WP_PHOTO_WALL_URL . 'public/slider-style.css',
             array(),
-            $slider_ver
+            filemtime(WP_PHOTO_WALL_PATH . 'public/slider-style.css')
         );
 
         wp_enqueue_script(
