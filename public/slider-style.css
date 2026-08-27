@@ -12,7 +12,7 @@
     background: #f2f2f4;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.08);
     /* Reserve aspect ratio to avoid layout shift before images load */
-    aspect-ratio: 28 / 9;
+    aspect-ratio: 16 / 6;
 }
 
 .wp-pw-track {
@@ -139,7 +139,7 @@
 
 @media (max-width: 600px) {
     .wp-photo-wall-slider {
-        aspect-ratio: 28 / 9;
+        aspect-ratio: 16 / 6;
         border-radius: 10px;
     }
 
