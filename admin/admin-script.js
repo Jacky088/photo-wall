@@ -95,6 +95,190 @@ jQuery(document).ready(function ($) {
     });
 
     // ==========================================
+    // Tab Navigation
+    // ==========================================
+    var $tabs = $('.wp-photo-wall-tabs .nav-tab');
+    var $panels = $('.wp-photo-wall-tab-panel');
+    var $activeTabInput = $('#wp_photo_wall_active_tab');
+
+    function switchTab(tab) {
+        $tabs.removeClass('nav-tab-active')
+            .filter('[data-tab="' + tab + '"]').addClass('nav-tab-active');
+
+        $panels.each(function () {
+            $(this).prop('hidden', $(this).data('tab') !== tab);
+        });
+
+        $activeTabInput.val(tab);
+
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, '', '#' + tab);
+        }
+    }
+
+    $tabs.on('click', function (e) {
+        e.preventDefault();
+        switchTab($(this).data('tab'));
+    });
+
+    // Restore tab from the URL hash (if any) on page load.
+    var initialTab = window.location.hash.replace('#', '');
+    if (initialTab && $tabs.filter('[data-tab="' + initialTab + '"]').length) {
+        switchTab(initialTab);
+    }
+
+    // ==========================================
+    // Reusable Confirmation Dialog
+    // ==========================================
+    var $confirmModal = $('#wp-photo-wall-confirm-modal');
+    var $confirmTitle = $confirmModal.find('#wp-photo-wall-confirm-title');
+    var $confirmMessage = $confirmModal.find('.wp-photo-wall-confirm-message');
+    var $confirmDetails = $confirmModal.find('.wp-photo-wall-confirm-details');
+    var $confirmTyped = $confirmModal.find('.wp-photo-wall-confirm-typed');
+    var $confirmTypedLabel = $confirmTyped.find('label');
+    var $confirmWord = $('#wp-photo-wall-confirm-word');
+    var $confirmOk = $confirmModal.find('.wp-photo-wall-confirm-ok');
+    var $confirmCancel = $confirmModal.find('.wp-photo-wall-confirm-cancel');
+    var confirmCallback = null;
+    var confirmRequiredWord = '';
+
+    function closeConfirm() {
+        $confirmModal.prop('hidden', true);
+        confirmCallback = null;
+        confirmRequiredWord = '';
+    }
+
+    /**
+     * Show the confirmation dialog.
+     * opts: { title, message, details:[], confirmLabel, danger, requireWord }
+     */
+    function wpPwConfirm(opts, onConfirm) {
+        opts = opts || {};
+        confirmCallback = typeof onConfirm === 'function' ? onConfirm : null;
+        confirmRequiredWord = opts.requireWord || '';
+
+        $confirmTitle.text(opts.title || '');
+        $confirmMessage.text(opts.message || '').prop('hidden', !opts.message);
+
+        var details = opts.details || [];
+        if (details.length) {
+            var detailsHtml = '';
+            details.forEach(function (line) {
+                detailsHtml += '<li>' + escapeHtml(line) + '</li>';
+            });
+            $confirmDetails.html(detailsHtml).prop('hidden', false);
+        } else {
+            $confirmDetails.empty().prop('hidden', true);
+        }
+
+        if (confirmRequiredWord) {
+            $confirmTypedLabel.text(wp_photo_wall_ajax.labels.confirm_word_hint || '');
+            $confirmWord.val('');
+            $confirmTyped.prop('hidden', false);
+            $confirmOk.prop('disabled', true);
+        } else {
+            $confirmTyped.prop('hidden', true);
+            $confirmOk.prop('disabled', false);
+        }
+
+        $confirmOk
+            .text(opts.confirmLabel || wp_photo_wall_ajax.labels.confirm_delete || 'OK')
+            .toggleClass('wp-photo-wall-btn-danger', !!opts.danger);
+        $confirmCancel.text(wp_photo_wall_ajax.labels.cancel || '');
+
+        $confirmModal.prop('hidden', false);
+
+        setTimeout(function () {
+            if (confirmRequiredWord) {
+                $confirmWord.focus();
+            } else {
+                $confirmOk.focus();
+            }
+        }, 0);
+    }
+
+    $confirmWord.on('input', function () {
+        var typed = $(this).val().trim().toUpperCase();
+        $confirmOk.prop('disabled', typed !== confirmRequiredWord);
+    });
+
+    $confirmCancel.on('click', closeConfirm);
+
+    $confirmOk.on('click', function () {
+        if ($confirmOk.prop('disabled')) return;
+        var cb = confirmCallback;
+        closeConfirm();
+        if (typeof cb === 'function') cb();
+    });
+
+    // Close when clicking the backdrop or pressing Escape.
+    $confirmModal.on('click', function (e) {
+        if (e.target === this) closeConfirm();
+    });
+    $(document).on('keydown', function (e) {
+        if (e.key === 'Escape' && !$confirmModal.prop('hidden')) {
+            closeConfirm();
+        }
+    });
+
+    // ==========================================
+    // Pending permanent deletions (applied on save)
+    // ==========================================
+    var $pendingInput = $('#photo_wall_pending_deletions');
+
+    function getPendingDeletions() {
+        try {
+            var parsed = JSON.parse($pendingInput.val() || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function setPendingDeletions(list) {
+        $pendingInput.val(JSON.stringify(list));
+    }
+
+    function queuePendingDeletion(id) {
+        id = parseInt(id, 10) || 0;
+        if (id <= 0) return;
+        var pending = getPendingDeletions();
+        if (pending.indexOf(id) === -1) {
+            pending.push(id);
+            setPendingDeletions(pending);
+        }
+    }
+
+    // Drop a queued deletion when the same attachment is (re)added to the wall/carousel.
+    function unqueuePendingDeletion(id) {
+        id = parseInt(id, 10) || 0;
+        if (id <= 0) return;
+        var pending = getPendingDeletions().filter(function (pid) {
+            return parseInt(pid, 10) !== id;
+        });
+        setPendingDeletions(pending);
+    }
+
+    // Impact text for a local (Media Library) image: deleting it also deletes the
+    // Media Library file on save so no orphan is left behind.
+    function localRemovalImpact() {
+        return wp_photo_wall_ajax.labels.impact_local_delete;
+    }
+
+    function countItemsByType($items) {
+        var counts = { local: 0, external: 0 };
+        $items.each(function () {
+            var type = $(this).data('type');
+            if (type === 'local') {
+                counts.local++;
+            } else {
+                counts.external++;
+            }
+        });
+        return counts;
+    }
+
+    // ==========================================
     // Core Rendering Logic
     // ==========================================
     function renderAll() {
@@ -359,6 +543,7 @@ jQuery(document).ready(function ($) {
                 } else {
                     thumbUrl = attachment.url;
                 }
+                unqueuePendingDeletion(attachment.id);
                 currentData.push({ type: 'local', id: attachment.id, group_id: 'uncategorized', thumb_url: thumbUrl });
             });
 
@@ -420,25 +605,67 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    // Remove Item
+    // Remove Item (single) - type-aware confirmation
     $(document).on('click', '.photo-wall-remove', function (e) {
         e.preventDefault();
-        $(this).parent().remove();
-        updateDataFromDOM();
-        updateBulkBtnState();
-        markDirty();
+        var $item = $(this).closest('.wp-photo-wall-preview-item');
+        var type = $item.data('type');
+        var L = wp_photo_wall_ajax.labels;
+
+        var details = type === 'local'
+            ? [localRemovalImpact(), L.save_to_apply_note]
+            : [L.impact_external, L.save_to_apply_note];
+
+        wpPwConfirm({
+            title: L.confirm_remove_title,
+            message: type === 'local' ? L.confirm_remove_local : L.confirm_remove_external,
+            details: details,
+            confirmLabel: L.remove
+        }, function () {
+            if (type === 'local') {
+                queuePendingDeletion($item.data('id'));
+            }
+            $item.remove();
+            updateDataFromDOM();
+            updateBulkBtnState();
+            markDirty();
+        });
     });
 
-    // Clear All (with typed confirmation)
+    // Clear All (typed confirmation + type breakdown)
     $(document).on('click', '#wp-photo-wall-clear-btn', function (e) {
         e.preventDefault();
-        var input = prompt(wp_photo_wall_ajax.labels.clear_all_confirm_text);
-        if (input && input.trim().toUpperCase() === 'CONFIRM') {
+        var L = wp_photo_wall_ajax.labels;
+        var counts = countItemsByType($('.wp-photo-wall-preview-item'));
+
+        var details = [];
+        if (counts.local > 0) {
+            details.push(L.detail_local_count.replace(/%d/g, counts.local) + ' — ' + localRemovalImpact());
+        }
+        if (counts.external > 0) {
+            details.push(L.detail_external_count.replace(/%d/g, counts.external) + ' — ' + L.impact_external);
+        }
+        details.push(L.impact_clear);
+        details.push(L.save_to_apply_note);
+
+        wpPwConfirm({
+            title: L.confirm_clear_title,
+            message: L.confirm_clear.replace(/%d/g, currentData.length),
+            details: details,
+            confirmLabel: L.clear_all,
+            danger: true,
+            requireWord: 'CONFIRM'
+        }, function () {
+            currentData.forEach(function (item) {
+                if (item.type === 'local') {
+                    queuePendingDeletion(item.id);
+                }
+            });
             currentData = [];
             renderAll();
             updateDataFromDOM();
             markDirty();
-        }
+        });
     });
 
     // ==========================================
@@ -536,22 +763,47 @@ jQuery(document).ready(function ($) {
     });
 
     // ==========================================
-    // Bulk Remove
+    // Bulk Remove (type-aware confirmation)
     // ==========================================
     $(document).on('click', '#wp-photo-wall-bulk-remove-btn', function (e) {
         e.preventDefault();
         var $checked = $('.photo-wall-checkbox:checked');
         if (!$checked.length) return;
-        if (confirm(wp_photo_wall_ajax.labels.remove_confirm.replace(/%d/g, $checked.length))) {
-            $checked.closest('.wp-photo-wall-preview-item').remove();
+
+        var L = wp_photo_wall_ajax.labels;
+        var $items = $checked.closest('.wp-photo-wall-preview-item');
+        var counts = countItemsByType($items);
+
+        var details = [];
+        if (counts.local > 0) {
+            details.push(L.detail_local_count.replace(/%d/g, counts.local) + ' — ' + localRemovalImpact());
+        }
+        if (counts.external > 0) {
+            details.push(L.detail_external_count.replace(/%d/g, counts.external) + ' — ' + L.impact_external);
+        }
+        details.push(L.save_to_apply_note);
+
+        wpPwConfirm({
+            title: L.confirm_remove_title,
+            message: L.confirm_remove_bulk.replace(/%d/g, $items.length),
+            details: details,
+            confirmLabel: L.bulk_delete_selected
+        }, function () {
+            $items.each(function () {
+                var $it = $(this);
+                if ($it.data('type') === 'local') {
+                    queuePendingDeletion($it.data('id'));
+                }
+            });
+            $items.remove();
             updateDataFromDOM();
             updateBulkBtnState();
             markDirty();
-        }
+        });
     });
 
     // ==========================================
-    // Delete from Media Library
+    // Permanently delete from Media Library (queued; applied on save)
     // ==========================================
     $(document).on('click', '#wp-photo-wall-delete-media-btn', function (e) {
         e.preventDefault();
@@ -563,40 +815,31 @@ jQuery(document).ready(function ($) {
         $checked.each(function () {
             var $p = $(this).closest('.wp-photo-wall-preview-item');
             if ($p.data('type') === 'local') {
-                localIds.push($p.data('id'));
+                localIds.push(parseInt($p.data('id'), 10) || 0);
                 $localItems = $localItems.add($p);
             }
         });
 
-        if (localIds.length > 0) {
-            var doDelete = confirm(wp_photo_wall_ajax.labels.delete_server_confirm.replace(/%d/g, localIds.length));
+        localIds = localIds.filter(function (id) { return id > 0; });
+        if (!localIds.length) return;
 
-            if (doDelete) {
-                $.ajax({
-                    url: wp_photo_wall_ajax.ajax_url,
-                    type: 'POST',
-                    data: {
-                        action: 'delete_photo_wall_image',
-                        attachment_ids: localIds,
-                        security: wp_photo_wall_ajax.nonce
-                    },
-                    success: function (res) {
-                        if (res.success) {
-                            $localItems.remove();
-                            updateDataFromDOM();
-                            updateBulkBtnState();
-                            markDirty();
-                            alert(wp_photo_wall_ajax.labels.done);
-                        } else {
-                            alert(res.data);
-                        }
-                    },
-                    error: function () {
-                        alert(wp_photo_wall_ajax.labels.ajax_error);
-                    }
-                });
-            }
-        }
+        var L = wp_photo_wall_ajax.labels;
+
+        wpPwConfirm({
+            title: L.confirm_perm_delete_title,
+            message: L.confirm_perm_delete.replace(/%d/g, localIds.length),
+            details: [L.impact_perm_delete, L.save_to_apply_note_perm],
+            confirmLabel: L.delete_from_media,
+            danger: true
+        }, function () {
+            localIds.forEach(function (id) {
+                queuePendingDeletion(id);
+            });
+            $localItems.remove();
+            updateDataFromDOM();
+            updateBulkBtnState();
+            markDirty();
+        });
     });
 
     // ==========================================
@@ -701,6 +944,7 @@ jQuery(document).ready(function ($) {
                     thumbUrl = attachment.url;
                 }
                 var slides = getSlides();
+                unqueuePendingDeletion(attachment.id);
                 slides.push({ type: 'local', id: attachment.id, url: thumbUrl, full: attachment.url, thumb_url: thumbUrl });
                 setSlides(slides);
             });
@@ -729,11 +973,29 @@ jQuery(document).ready(function ($) {
         initSlidesSortable();
     });
 
-    // Remove slide
+    // Remove slide (type-aware confirmation)
     $(document).on('click', '.wp-pw-slide-remove', function (e) {
         e.preventDefault();
-        $(this).closest('.wp-pw-slide-item').remove();
-        syncSlidesFromDOM();
+        var $slide = $(this).closest('.wp-pw-slide-item');
+        var type = $slide.data('type');
+        var L = wp_photo_wall_ajax.labels;
+
+        var details = type === 'local'
+            ? [L.impact_slide_local, L.save_to_apply_note]
+            : [L.impact_external, L.save_to_apply_note];
+
+        wpPwConfirm({
+            title: L.confirm_remove_title,
+            message: L.confirm_remove_slide,
+            details: details,
+            confirmLabel: L.remove
+        }, function () {
+            if (type === 'local') {
+                queuePendingDeletion($slide.data('id'));
+            }
+            $slide.remove();
+            syncSlidesFromDOM();
+        });
     });
 
     // Initial render + sortable

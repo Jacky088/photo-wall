@@ -4,6 +4,15 @@
     padding: 20px;
 }
 
+/* Tab navigation */
+.wp-photo-wall-tabs {
+    margin-bottom: 20px;
+}
+
+.wp-photo-wall-tab-panel[hidden] {
+    display: none;
+}
+
 /* Top Banner Carousel (slides) admin */
 .wp-photo-wall-slides-box {
     max-width: none;
@@ -42,37 +51,52 @@
     border-radius: 6px;
 }
 
+/* Tile matches the photo-wall item size (110x110) for cross-tab consistency. */
 .wp-pw-slide-item {
     position: relative;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 140px;
-    padding: 6px;
+    box-sizing: border-box;
+    width: 110px;
+    height: 110px;
     background: #fff;
     border: 1px solid #dcdcde;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 
 .wp-pw-slide-handle {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 20;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
     cursor: grab;
-    color: #8c8f94;
-    font-size: 14px;
+    font-size: 10px;
     line-height: 1;
     user-select: none;
 }
 
 .wp-pw-slide-thumb {
-    width: 48px;
-    height: 48px;
+    display: block;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
     border-radius: 4px;
     background: #eee;
 }
 
 .wp-pw-slide-type {
-    font-size: 11px;
-    color: #646970;
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    z-index: 20;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    font-size: 10px;
+    line-height: 1.4;
     text-transform: uppercase;
 }
 
@@ -133,11 +157,11 @@
 }
 
 .wp-pw-slide-placeholder {
-    width: 140px;
-    height: 64px;
+    width: 110px;
+    height: 110px;
     background: #e2e4e7;
     border: 1px dashed #8c8f94;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 
 /* Inline Group Management */
@@ -374,6 +398,55 @@
     justify-content: center;
     background: #f0f0f1;
     border-radius: 4px;
+}
+
+/* Reusable confirmation modal */
+#wp-photo-wall-confirm-modal .wp-photo-wall-confirm-message {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+#wp-photo-wall-confirm-modal .wp-photo-wall-confirm-details {
+    margin: 10px 0 0;
+    padding: 10px 10px 10px 28px;
+    list-style: disc;
+    background: #f6f7f7;
+    border-radius: 4px;
+    color: #50575e;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+#wp-photo-wall-confirm-modal .wp-photo-wall-confirm-details li {
+    margin-bottom: 4px;
+}
+
+#wp-photo-wall-confirm-modal .wp-photo-wall-confirm-details li:last-child {
+    margin-bottom: 0;
+}
+
+#wp-photo-wall-confirm-modal .wp-photo-wall-confirm-typed {
+    margin-top: 14px;
+}
+
+#wp-photo-wall-confirm-modal .wp-photo-wall-confirm-typed label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+#wp-photo-wall-confirm-modal .button.wp-photo-wall-btn-danger {
+    background: #d63638;
+    border-color: #d63638;
+    color: #fff;
+}
+
+#wp-photo-wall-confirm-modal .button.wp-photo-wall-btn-danger:hover,
+#wp-photo-wall-confirm-modal .button.wp-photo-wall-btn-danger:focus {
+    background: #b32d2e;
+    border-color: #b32d2e;
+    color: #fff;
 }
 
 /* Save Area */

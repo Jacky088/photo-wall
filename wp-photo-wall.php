@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: 照片墙插件
+ * Plugin Name: 图片墙插件
  * Description: A minimalist, Apple-inspired photo wall plugin with admin management.
- * Version: 2.3.0
+ * Version: 2.5.0
  * Author: 木木
  * Text Domain: wp-photo-wall
  * Requires at least: 6.0
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('WP_PHOTO_WALL_PATH', plugin_dir_path(__FILE__));
 define('WP_PHOTO_WALL_URL', plugin_dir_url(__FILE__));
-define('WP_PHOTO_WALL_VERSION', '2.3.0');
+define('WP_PHOTO_WALL_VERSION', '2.5.0');
 
 // Load modules
 require_once WP_PHOTO_WALL_PATH . 'includes/i18n.php';
@@ -45,8 +45,6 @@ function wp_photo_wall_admin_enqueue($hook)
     );
 
     wp_localize_script('wp-photo-wall-admin', 'wp_photo_wall_ajax', array(
-        'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('wp_photo_wall_delete_nonce'),
         'labels' => array(
             'local' => wp_photo_wall_text('from_media_library'),
             'external' => wp_photo_wall_text('from_link'),
@@ -79,6 +77,30 @@ function wp_photo_wall_admin_enqueue($hook)
             'add_to_wall' => wp_photo_wall_text('add_to_wall'),
             'slides_add_to_carousel' => wp_photo_wall_text('slides_add_to_carousel'),
             'image_url' => wp_photo_wall_text('image_url'),
+            'confirm_remove_title' => wp_photo_wall_text('confirm_remove_title'),
+            'confirm_perm_delete_title' => wp_photo_wall_text('confirm_perm_delete_title'),
+            'confirm_clear_title' => wp_photo_wall_text('confirm_clear_title'),
+            'confirm_remove_local' => wp_photo_wall_text('confirm_remove_local'),
+            'confirm_remove_external' => wp_photo_wall_text('confirm_remove_external'),
+            'confirm_remove_bulk' => wp_photo_wall_text('confirm_remove_bulk'),
+            'confirm_remove_slide' => wp_photo_wall_text('confirm_remove_slide'),
+            'confirm_perm_delete' => wp_photo_wall_text('confirm_perm_delete'),
+            'confirm_clear' => wp_photo_wall_text('confirm_clear'),
+            'impact_external' => wp_photo_wall_text('impact_external'),
+            'impact_local_delete' => wp_photo_wall_text('impact_local_delete'),
+            'impact_perm_delete' => wp_photo_wall_text('impact_perm_delete'),
+            'impact_slide_local' => wp_photo_wall_text('impact_slide_local'),
+            'impact_clear' => wp_photo_wall_text('impact_clear'),
+            'detail_local_count' => wp_photo_wall_text('detail_local_count'),
+            'detail_external_count' => wp_photo_wall_text('detail_external_count'),
+            'save_to_apply_note' => wp_photo_wall_text('save_to_apply_note'),
+            'save_to_apply_note_perm' => wp_photo_wall_text('save_to_apply_note_perm'),
+            'confirm_word_hint' => wp_photo_wall_text('confirm_word_hint'),
+            'confirm_delete' => wp_photo_wall_text('confirm_delete'),
+            'bulk_delete_selected' => wp_photo_wall_text('bulk_delete_selected'),
+            'delete_from_media' => wp_photo_wall_text('delete_from_media'),
+            'clear_all' => wp_photo_wall_text('clear_all'),
+            'cancel' => wp_photo_wall_text('cancel'),
         )
     ));
 
@@ -137,12 +159,6 @@ function wp_photo_wall_render_admin_page()
                 $validated_groups = wp_photo_wall_sanitize_groups($groups_raw);
                 $validated_data = wp_photo_wall_sanitize_items($decoded, $validated_groups);
 
-                // Orphan prevention: capture which media library attachments the
-                // plugin referenced BEFORE this save (wall + banner carousel).
-                $old_wall_ids    = wp_photo_wall_collect_local_ids(wp_photo_wall_get_items($validated_groups));
-                $old_slides_ids  = wp_photo_wall_get_slides_local_ids();
-                $old_referenced  = array_merge($old_wall_ids, $old_slides_ids);
-
                 update_option('photo_wall_data', wp_json_encode($validated_data), false);
                 update_option('photo_wall_groups', wp_json_encode($validated_groups), false);
 
@@ -159,12 +175,6 @@ function wp_photo_wall_render_admin_page()
                         $download_link = esc_url_raw(wp_unslash($_POST['wp_photo_wall_download_link']), array('http', 'https'));
                         update_option('wp_photo_wall_download_link', $download_link);
                     }
-                }
-
-                // Orphan prevention setting.
-                if (isset($_POST['submit'])) {
-                    $auto_delete = isset($_POST['wp_photo_wall_auto_delete_orphans']) ? '1' : '0';
-                    update_option('wp_photo_wall_auto_delete_orphans', $auto_delete);
                 }
 
                 // Save top banner carousel settings + selected slides.
@@ -191,22 +201,63 @@ function wp_photo_wall_render_admin_page()
                     }
                 }
 
-                // Orphan prevention: after saving the new state, delete media
-                // library attachments that dropped out of every reference.
-                $auto_delete_enabled = get_option('wp_photo_wall_auto_delete_orphans', '1') === '1';
-                $orphan_deleted = 0;
-                if ($auto_delete_enabled) {
-                    $new_wall_ids   = $local_ids;
-                    $new_slides_ids = wp_photo_wall_get_slides_local_ids();
-                    $new_referenced = array_merge($new_wall_ids, $new_slides_ids);
+                // What the plugin still references after this save (wall + carousel).
+                // Deletion below is skipped for anything in this set so no reference
+                // is ever left dangling.
+                $new_referenced = array_merge($local_ids, wp_photo_wall_get_slides_local_ids());
 
-                    $orphan_deleted = wp_photo_wall_delete_orphaned_attachments($old_referenced, $new_referenced);
+                // Explicit deletions queued from the admin (Media Library images the
+                // user removed from the wall or the carousel). Applied here, on save,
+                // so an unsaved removal never touches the server and the page can be
+                // reloaded to revert. Anything still referenced elsewhere is skipped
+                // so no reference is left dangling.
+                $explicit_deleted_ids = array();
+                if (isset($_POST['photo_wall_pending_deletions'])) {
+                    $pending_raw = json_decode(wp_unslash($_POST['photo_wall_pending_deletions']), true);
+                    if (is_array($pending_raw)) {
+                        $candidates = array();
+                        foreach (array_slice($pending_raw, 0, 500) as $pending_id) {
+                            $pending_id = absint($pending_id);
+                            if ($pending_id > 0 && !in_array($pending_id, $new_referenced, true)) {
+                                $candidates[] = $pending_id;
+                            }
+                        }
+
+                        if (!empty($candidates)) {
+                            $explicit_deleted_ids = wp_photo_wall_delete_attachments($candidates);
+                        }
+                    }
                 }
 
-                if ($orphan_deleted > 0) {
-                    $msg = sprintf(wp_photo_wall_text('orphan_cleanup_done'), $orphan_deleted);
+                if (!empty($explicit_deleted_ids)) {
+                    // Drop any leftover reference to the deleted attachments so the
+                    // wall and the carousel never keep a dangling id behind.
+                    $local_ids = wp_photo_wall_purge_deleted_ids($validated_data, $explicit_deleted_ids);
+                    update_option('photo_wall_data', wp_json_encode($validated_data), false);
+                    update_option('photo_wall_ids', implode(',', $local_ids), false);
+
+                    $stored_slides = get_option(WP_PHOTO_WALL_SLIDES_OPTION, array());
+                    if (is_array($stored_slides)) {
+                        $kept_slides = array();
+                        foreach ($stored_slides as $stored_slide) {
+                            if (
+                                is_array($stored_slide)
+                                && isset($stored_slide['type'], $stored_slide['id'])
+                                && $stored_slide['type'] === 'local'
+                                && in_array((int) $stored_slide['id'], $explicit_deleted_ids, true)
+                            ) {
+                                continue;
+                            }
+                            $kept_slides[] = $stored_slide;
+                        }
+                        if (count($kept_slides) !== count($stored_slides)) {
+                            update_option(WP_PHOTO_WALL_SLIDES_OPTION, $kept_slides, false);
+                        }
+                    }
+
+                    $msg = sprintf(wp_photo_wall_text('settings_saved_deleted'), count($explicit_deleted_ids));
                 } else {
-                    $msg = wp_photo_wall_text('orphan_cleanup_none');
+                    $msg = wp_photo_wall_text('settings_saved');
                 }
                 echo '<div class="notice notice-success is-dismissible"><p>' . esc_html($msg) . '</p></div>';
             } else {

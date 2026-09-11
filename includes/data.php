@@ -137,6 +137,35 @@ function wp_photo_wall_collect_local_ids($items)
 }
 
 /**
+ * Remove items that reference deleted attachments (in place) and return the
+ * remaining local attachment IDs.
+ *
+ * @param array $items       Items array (modified by reference).
+ * @param array $deleted_ids Attachment IDs that were permanently deleted.
+ * @return int[]             Remaining local attachment IDs.
+ */
+function wp_photo_wall_purge_deleted_ids(&$items, $deleted_ids)
+{
+    $deleted = array_map('intval', (array) $deleted_ids);
+    $kept = array();
+
+    foreach ((array) $items as $item) {
+        if (
+            is_array($item)
+            && isset($item['type'], $item['id'])
+            && $item['type'] === 'local'
+            && in_array((int) $item['id'], $deleted, true)
+        ) {
+            continue;
+        }
+        $kept[] = $item;
+    }
+
+    $items = $kept;
+    return wp_photo_wall_collect_local_ids($kept);
+}
+
+/**
  * Collect local attachment IDs currently stored in the top banner carousel.
  *
  * @return int[]
@@ -157,35 +186,29 @@ function wp_photo_wall_get_slides_local_ids()
 }
 
 /**
- * Permanently delete media library attachments that the plugin no longer
- * references anywhere (neither the photo wall nor the top banner carousel).
+ * Permanently delete the given media library attachments.
  *
- * This is the single source of truth for orphan prevention: pass the union of
- * attachment IDs the plugin tracked before a change and the union it tracks
- * after; anything that dropped out is deleted from the media library.
+ * Used when the admin explicitly deletes a Media Library image from the wall or
+ * the banner carousel: only the requested ids are touched, never a computed
+ * "everything that disappeared" set, so a stale form can never mass-delete.
  *
- * @param array $old_ids  IDs referenced before the change (wall + slides).
- * @param array $new_ids  IDs referenced after the change (wall + slides).
- * @return int            Number of attachments actually deleted.
+ * @param array $ids  Attachment IDs to delete.
+ * @return int[]      IDs that were actually deleted.
  */
-function wp_photo_wall_delete_orphaned_attachments($old_ids, $new_ids)
+function wp_photo_wall_delete_attachments($ids)
 {
-    $old = array_map('intval', (array) $old_ids);
-    $new = array_map('intval', (array) $new_ids);
+    $deleted = array();
 
-    $orphans = array_diff($old, $new);
-    if (empty($orphans)) return 0;
-
-    $deleted = 0;
-    foreach ($orphans as $id) {
+    foreach ((array) $ids as $id) {
         $id = (int) $id;
         if ($id <= 0) continue;
         // Only touch real image attachments we actually control.
         if (!wp_attachment_is_image($id)) continue;
         if (!current_user_can('delete_post', $id)) continue;
         if (wp_delete_attachment($id, true)) {
-            $deleted++;
+            $deleted[] = $id;
         }
     }
+
     return $deleted;
 }
