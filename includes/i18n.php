@@ -483,9 +483,19 @@ function wp_photo_wall_text($key)
             'zh_TW' => '頂部海報輪播'
         ),
         'slides_desc' => array(
-            'en' => 'Supports local media library images and external links.',
-            'zh_CN' => '支持本地媒体库图片和外部链接图片。',
-            'zh_TW' => '支持本地媒體庫圖片和外部鏈接圖片。'
+            'en' => 'Supports local media library images and external links. Up to %d images; once the limit is reached no more can be added.',
+            'zh_CN' => '支持本地媒体库图片和外部链接图片，最多 %d 张，超出后无法继续添加。',
+            'zh_TW' => '支持本地媒體庫圖片和外部鏈接圖片，最多 %d 張，超出後無法繼續添加。'
+        ),
+        'slides_count' => array(
+            'en' => 'Added %d / %d',
+            'zh_CN' => '已添加 %d / %d',
+            'zh_TW' => '已加入 %d / %d'
+        ),
+        'slides_limit_reached' => array(
+            'en' => 'The banner carousel allows up to %d images. Please remove some before adding more.',
+            'zh_CN' => '顶部海报轮播最多 %d 张，无法继续添加，请先移除部分图片。',
+            'zh_TW' => '頂部海報輪播最多 %d 張，無法繼續添加，請先移除部分圖片。'
         ),
         'slides_enable' => array(
             'en' => 'Enable Carousel',

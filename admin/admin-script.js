@@ -71,14 +71,14 @@ jQuery(document).ready(function ($) {
         if (!isDirty) {
             isDirty = true;
             $unsavedNotice.addClass('is-visible');
-            $('#submit').addClass('wp-photo-wall-btn-pulse');
+            $('.wp-photo-wall-save-btn, #submit').addClass('wp-photo-wall-btn-pulse');
         }
     }
 
     function markClean() {
         isDirty = false;
         $unsavedNotice.removeClass('is-visible');
-        $('#submit').removeClass('wp-photo-wall-btn-pulse');
+        $('.wp-photo-wall-save-btn, #submit').removeClass('wp-photo-wall-btn-pulse');
     }
 
     // Warn before leaving with unsaved changes
@@ -849,6 +849,27 @@ jQuery(document).ready(function ($) {
     var $slidesList = $('#wp-pw-slides-list');
     var slidesFrame;
 
+    // The carousel is capped (WP_PHOTO_WALL_SLIDES_MAX on the PHP side).
+    var slidesMax = parseInt(wp_photo_wall_ajax.slides_max, 10) || 6;
+    var $slidesCount = $('.wp-pw-slides-count');
+
+    function updateSlidesCount() {
+        if (!$slidesCount.length) return;
+        var count = getSlides().length;
+        $slidesCount
+            .text(wp_photo_wall_ajax.labels.slides_count.replace('%d', count).replace('%d', slidesMax))
+            .toggleClass('is-full', count >= slidesMax);
+    }
+
+    // Returns true (and warns) when no more slides may be added.
+    function slidesLimitReached() {
+        if (getSlides().length >= slidesMax) {
+            alert(wp_photo_wall_ajax.labels.slides_limit_reached.replace(/%d/g, slidesMax));
+            return true;
+        }
+        return false;
+    }
+
     function getSlides() {
         try {
             var raw = $slidesInput.val();
@@ -886,6 +907,7 @@ jQuery(document).ready(function ($) {
                 '</li>';
         });
         $slidesList.html(html);
+        updateSlidesCount();
     }
 
     // Init sortable for slides list
@@ -925,6 +947,7 @@ jQuery(document).ready(function ($) {
             alert('WordPress Media Library is not available.');
             return;
         }
+        if (slidesLimitReached()) return;
         if (slidesFrame) { slidesFrame.open(); return; }
         slidesFrame = wp.media({
             title: wp_photo_wall_ajax.labels.slides_add_local,
@@ -933,7 +956,15 @@ jQuery(document).ready(function ($) {
         });
         slidesFrame.on('select', function () {
             var selection = slidesFrame.state().get('selection');
+            var slides = getSlides();
+            var added = 0;
+            var skipped = 0;
+
             selection.map(function (attachment) {
+                if (slides.length >= slidesMax) {
+                    skipped++;
+                    return;
+                }
                 attachment = attachment.toJSON();
                 var thumbUrl = '';
                 if (attachment.sizes) {
@@ -943,13 +974,19 @@ jQuery(document).ready(function ($) {
                 } else {
                     thumbUrl = attachment.url;
                 }
-                var slides = getSlides();
                 unqueuePendingDeletion(attachment.id);
                 slides.push({ type: 'local', id: attachment.id, url: thumbUrl, full: attachment.url, thumb_url: thumbUrl });
-                setSlides(slides);
+                added++;
             });
-            renderSlides();
-            initSlidesSortable();
+
+            if (added > 0) {
+                setSlides(slides);
+                renderSlides();
+                initSlidesSortable();
+            }
+            if (skipped > 0) {
+                alert(wp_photo_wall_ajax.labels.slides_limit_reached.replace(/%d/g, slidesMax));
+            }
         });
         slidesFrame.open();
     });
@@ -959,6 +996,7 @@ jQuery(document).ready(function ($) {
     var slideExternalPreview = null;
     $(document).on('click', '.wp-pw-add-external', function (e) {
         e.preventDefault();
+        if (slidesLimitReached()) return;
         var url = prompt(wp_photo_wall_ajax.labels.image_url + ' (https://...):');
         if (!url) return;
         url = url.trim();

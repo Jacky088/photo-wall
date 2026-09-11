@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) exit;
 
 <div class="wp-photo-wall-slides-box">
     <h2><?php echo esc_html(wp_photo_wall_text('slides_title')); ?></h2>
-    <p class="description"><?php echo esc_html(wp_photo_wall_text('slides_desc')); ?></p>
+    <p class="description"><?php echo esc_html(sprintf(wp_photo_wall_text('slides_desc'), WP_PHOTO_WALL_SLIDES_MAX)); ?></p>
 
     <table class="form-table" role="presentation">
         <tbody>
@@ -51,6 +51,7 @@ if (!defined('ABSPATH')) exit;
             <button type="button" class="button wp-pw-add-external">
                 <?php echo esc_html(wp_photo_wall_text('slides_add_external')); ?>
             </button>
+            <span class="wp-pw-slides-count" aria-live="polite"></span>
         </div>
 
         <ul class="wp-pw-slides-list" id="wp-pw-slides-list">
@@ -79,5 +80,9 @@ if (!defined('ABSPATH')) exit;
             ?>
         </ul>
         <p class="description"><?php echo esc_html(wp_photo_wall_text('slides_order_hint')); ?></p>
+    </div>
+
+    <div class="wp-photo-wall-save-area">
+        <input type="submit" name="submit" class="button button-primary wp-photo-wall-save-btn" value="<?php echo esc_attr(wp_photo_wall_text('save_changes')); ?>">
     </div>
 </div>

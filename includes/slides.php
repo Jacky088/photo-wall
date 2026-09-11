@@ -14,6 +14,9 @@ define('WP_PHOTO_WALL_SLIDES_ENABLED_OPTION', 'photo_wall_slides_enabled');
 define('WP_PHOTO_WALL_SLIDES_INTERVAL_OPTION', 'photo_wall_slides_interval');
 define('WP_PHOTO_WALL_SLIDES_LINK_OPTION', 'photo_wall_slides_link');
 
+/** Hard cap on how many images the banner carousel can hold. */
+define('WP_PHOTO_WALL_SLIDES_MAX', 6);
+
 /**
  * Sanitize a single slide entry.
  *
@@ -75,6 +78,9 @@ function wp_photo_wall_save_slides($raw) {
             }
         }
     }
+
+    // Safety net: the UI blocks extra slides, but never persist more than the cap.
+    $slides = array_slice($slides, 0, WP_PHOTO_WALL_SLIDES_MAX);
 
     update_option(WP_PHOTO_WALL_SLIDES_OPTION, $slides, false);
     return true;

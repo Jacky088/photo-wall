@@ -45,6 +45,7 @@ function wp_photo_wall_admin_enqueue($hook)
     );
 
     wp_localize_script('wp-photo-wall-admin', 'wp_photo_wall_ajax', array(
+        'slides_max' => WP_PHOTO_WALL_SLIDES_MAX,
         'labels' => array(
             'local' => wp_photo_wall_text('from_media_library'),
             'external' => wp_photo_wall_text('from_link'),
@@ -76,6 +77,8 @@ function wp_photo_wall_admin_enqueue($hook)
             'slides_add_external' => wp_photo_wall_text('slides_add_external'),
             'add_to_wall' => wp_photo_wall_text('add_to_wall'),
             'slides_add_to_carousel' => wp_photo_wall_text('slides_add_to_carousel'),
+            'slides_count' => wp_photo_wall_text('slides_count'),
+            'slides_limit_reached' => wp_photo_wall_text('slides_limit_reached'),
             'image_url' => wp_photo_wall_text('image_url'),
             'confirm_remove_title' => wp_photo_wall_text('confirm_remove_title'),
             'confirm_perm_delete_title' => wp_photo_wall_text('confirm_perm_delete_title'),
