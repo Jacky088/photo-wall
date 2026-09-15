@@ -27,7 +27,8 @@ $open = false;
             $thumb = wp_get_attachment_image_url($id, 'medium_large');
             if ($full && $thumb) wp_photo_wall_render_image($thumb, $full, $index, $id);
         } else {
-            wp_photo_wall_render_image($item['url'], $item['url'], $index, 0);
+            $thumb = isset($item['thumb']) && $item['thumb'] ? $item['thumb'] : $item['url'];
+            wp_photo_wall_render_image($thumb, $item['url'], $index, 0);
         }
     endforeach;
     if ($open) echo '</div></div>'; ?>
@@ -36,6 +37,12 @@ $open = false;
     <?php if (count($all_items) > 12) : ?>
         <div class="wp-photo-wall-loader" role="status" aria-live="polite"><span class="screen-reader-text"><?php echo esc_html(wp_photo_wall_text('load_more')); ?></span></div>
     <?php endif; ?>
+
+    <?php
+    // Download button shown right below the wallpapers (the Bing group is
+    // always the last one). Hidden while no link is configured.
+    echo wp_photo_wall_bing_download_button();
+    ?>
 
     <?php $download_link = get_option('wp_photo_wall_download_link', ''); if ($download_link) : ?>
         <a href="<?php echo esc_url($download_link); ?>" class="wp-photo-wall-download-btn" target="_blank" rel="noopener noreferrer"><?php echo esc_html(wp_photo_wall_text('download_all')); ?></a>

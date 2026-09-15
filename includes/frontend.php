@@ -91,6 +91,11 @@ function wp_photo_wall_render_image($thumb_url, $full_url, $item_index, $attachm
         $img_attrs .= 'decoding="async" ';
         $img_attrs .= 'sizes="' . esc_attr($image_attrs['sizes']) . '" ';
         $img_attrs .= 'oncontextmenu="return false;" ';
+        // Remote thumbnails (e.g. Bing wallpapers) may 404 - fall back to the
+        // full size image instead of showing a broken tile.
+        if ($thumb_url !== $full_url) {
+            $img_attrs .= 'onerror="this.onerror=null;this.src=' . esc_attr(wp_json_encode($full_url)) . '" ';
+        }
         $img_attrs .= 'referrerpolicy="no-referrer"';
         echo '<img ' . $img_attrs . ' />';
     }

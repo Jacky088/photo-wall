@@ -8,6 +8,36 @@
 if (!defined('ABSPATH')) exit;
 
 /**
+ * Handle AJAX "Refresh Bing wallpapers" (admin only).
+ *
+ * Forces a fresh request against the submitted endpoint so the admin can
+ * preview a new API URL before saving it.
+ */
+function wp_photo_wall_ajax_bing_refresh()
+{
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(wp_photo_wall_text('permission_denied'));
+    }
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wp_photo_wall_bing_nonce')) {
+        wp_send_json_error('Security check failed.');
+    }
+
+    $api = isset($_POST['api'])
+        ? wp_photo_wall_bing_sanitize_api(wp_unslash($_POST['api']))
+        : wp_photo_wall_bing_api();
+
+    $items = wp_photo_wall_bing_fetch(true, $api);
+
+    wp_send_json_success(array(
+        'items' => $items,
+        'updated' => sprintf(wp_photo_wall_text('bing_last_update'), wp_photo_wall_bing_last_updated()),
+        'message' => sprintf(wp_photo_wall_text('bing_updated'), count($items)),
+    ));
+}
+add_action('wp_ajax_wp_photo_wall_bing_refresh', 'wp_photo_wall_ajax_bing_refresh');
+
+/**
  * Handle AJAX Load More Images (with nonce verification)
  */
 function wp_photo_wall_ajax_load_more()
@@ -66,7 +96,7 @@ function wp_photo_wall_ajax_load_more()
 
         if (isset($item['type']) && $item['type'] === 'external') {
             $full_url = $item['url'];
-            $thumb_url = $item['url'];
+            $thumb_url = !empty($item['thumb']) ? $item['thumb'] : $item['url'];
         } elseif (isset($item['type']) && $item['type'] === 'local') {
             $id = $item['id'];
             $attachment_id = intval($id);

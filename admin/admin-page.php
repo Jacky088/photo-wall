@@ -5,7 +5,7 @@ $initial_groups = wp_photo_wall_get_groups();
 
 // Remember the active tab across form submissions (page reloads).
 $active_tab = isset($_POST['wp_photo_wall_active_tab']) ? sanitize_key(wp_unslash($_POST['wp_photo_wall_active_tab'])) : 'banner';
-if (!in_array($active_tab, array('banner', 'photos'), true)) {
+if (!in_array($active_tab, array('banner', 'photos', 'bing'), true)) {
     $active_tab = 'banner';
 }
 ?>
@@ -27,6 +27,7 @@ if (!in_array($active_tab, array('banner', 'photos'), true)) {
         <h2 class="nav-tab-wrapper wp-photo-wall-tabs">
             <a href="#banner" class="nav-tab <?php echo $active_tab === 'banner' ? 'nav-tab-active' : ''; ?>" data-tab="banner"><?php echo esc_html(wp_photo_wall_text('tab_banner')); ?></a>
             <a href="#photos" class="nav-tab <?php echo $active_tab === 'photos' ? 'nav-tab-active' : ''; ?>" data-tab="photos"><?php echo esc_html(wp_photo_wall_text('tab_photos')); ?></a>
+            <a href="#bing" class="nav-tab <?php echo $active_tab === 'bing' ? 'nav-tab-active' : ''; ?>" data-tab="bing"><?php echo esc_html(wp_photo_wall_text('tab_bing')); ?></a>
         </h2>
 
         <!-- Tab: Home Banner -->
@@ -72,6 +73,11 @@ if (!in_array($active_tab, array('banner', 'photos'), true)) {
                 </div>
             </div>
         </div>
+
+        <!-- Tab: Bing Wallpaper -->
+        <div class="wp-photo-wall-tab-panel" data-tab="bing" <?php echo $active_tab === 'bing' ? '' : 'hidden'; ?>>
+            <?php include WP_PHOTO_WALL_PATH . 'admin/admin-bing.php'; ?>
+        </div>
     </form>
 
     <!-- Move to group modal -->
@@ -96,6 +102,21 @@ if (!in_array($active_tab, array('banner', 'photos'), true)) {
             <input type="url" id="wp-photo-wall-external-url" class="widefat" placeholder="https://example.com/image.jpg">
             <div id="wp-photo-wall-external-preview" aria-live="polite"><?php echo esc_html(wp_photo_wall_text('preview_area')); ?></div>
             <p class="submit"><button type="button" class="button" id="wp-photo-wall-external-cancel"><?php echo esc_html(wp_photo_wall_text('cancel')); ?></button> <button type="button" class="button button-primary" id="wp-photo-wall-external-confirm" disabled><?php echo esc_html(wp_photo_wall_text('add_to_wall')); ?></button></p>
+        </div>
+    </div>
+
+    <!-- Unsaved changes guard: leaving the page loses pending edits -->
+    <div id="wp-photo-wall-leave-modal" class="wp-photo-wall-modal" hidden>
+        <div class="wp-photo-wall-modal-dialog" role="alertdialog" aria-modal="true"
+            aria-labelledby="wp-photo-wall-leave-title" aria-describedby="wp-photo-wall-leave-message">
+            <h2 id="wp-photo-wall-leave-title"><?php echo esc_html(wp_photo_wall_text('leave_confirm_title')); ?></h2>
+            <p id="wp-photo-wall-leave-message" class="wp-photo-wall-leave-message">
+                <?php echo esc_html(wp_photo_wall_text('leave_confirm_message')); ?>
+            </p>
+            <p class="submit">
+                <button type="button" class="button button-primary wp-photo-wall-leave-stay"><?php echo esc_html(wp_photo_wall_text('leave_stay')); ?></button>
+                <button type="button" class="button button-link-delete wp-photo-wall-leave-discard"><?php echo esc_html(wp_photo_wall_text('leave_discard')); ?></button>
+            </p>
         </div>
     </div>
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 图片墙插件
  * Description: A minimalist, Apple-inspired photo wall plugin with admin management.
- * Version: 2.5.0
+ * Version: 2.8.0
  * Author: 木木
  * Text Domain: wp-photo-wall
  * Requires at least: 6.0
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('WP_PHOTO_WALL_PATH', plugin_dir_path(__FILE__));
 define('WP_PHOTO_WALL_URL', plugin_dir_url(__FILE__));
-define('WP_PHOTO_WALL_VERSION', '2.5.0');
+define('WP_PHOTO_WALL_VERSION', '2.8.0');
 
 // Load modules
 require_once WP_PHOTO_WALL_PATH . 'includes/i18n.php';
@@ -24,6 +24,11 @@ require_once WP_PHOTO_WALL_PATH . 'includes/data.php';
 require_once WP_PHOTO_WALL_PATH . 'includes/ajax.php';
 require_once WP_PHOTO_WALL_PATH . 'includes/frontend.php';
 require_once WP_PHOTO_WALL_PATH . 'includes/slides.php';
+require_once WP_PHOTO_WALL_PATH . 'includes/bing.php';
+
+// Arm / disarm the daily Bing wallpaper pull together with the plugin.
+register_activation_hook(__FILE__, 'wp_photo_wall_bing_cron_activate');
+register_deactivation_hook(__FILE__, 'wp_photo_wall_bing_cron_deactivate');
 
 /**
  * Enqueue Admin Scripts and Styles
@@ -104,7 +109,14 @@ function wp_photo_wall_admin_enqueue($hook)
             'delete_from_media' => wp_photo_wall_text('delete_from_media'),
             'clear_all' => wp_photo_wall_text('clear_all'),
             'cancel' => wp_photo_wall_text('cancel'),
-        )
+            'bing_refresh' => wp_photo_wall_text('bing_refresh'),
+            'bing_refreshing' => wp_photo_wall_text('bing_refreshing'),
+            'bing_fetch_failed' => wp_photo_wall_text('bing_fetch_failed'),
+            'bing_empty' => wp_photo_wall_text('bing_empty'),
+            'bing_updated' => wp_photo_wall_text('bing_updated'),
+            'leave_confirm' => wp_photo_wall_text('leave_confirm'),
+        ),
+        'bing_nonce' => wp_create_nonce('wp_photo_wall_bing_nonce'),
     ));
 
     wp_enqueue_style(
@@ -202,6 +214,48 @@ function wp_photo_wall_render_admin_page()
                     } else {
                         wp_photo_wall_save_slides(array());
                     }
+                }
+
+                // Save Bing wallpaper settings.
+                if (isset($_POST['submit'])) {
+                    update_option(WP_PHOTO_WALL_BING_ENABLED_OPTION, isset($_POST['photo_wall_bing_enabled']) ? '1' : '0');
+
+                    $bing_api = isset($_POST['photo_wall_bing_api'])
+                        ? wp_photo_wall_bing_sanitize_api(wp_unslash($_POST['photo_wall_bing_api']))
+                        : WP_PHOTO_WALL_BING_DEFAULT_API;
+                    update_option(WP_PHOTO_WALL_BING_API_OPTION, $bing_api);
+
+                    $bing_title = isset($_POST['photo_wall_bing_title'])
+                        ? wp_photo_wall_bing_sanitize_title(wp_unslash($_POST['photo_wall_bing_title']))
+                        : wp_photo_wall_text('bing_group_default');
+                    update_option(WP_PHOTO_WALL_BING_TITLE_OPTION, $bing_title);
+
+                    $bing_order_raw = isset($_POST['photo_wall_bing_order'])
+                        ? json_decode(wp_unslash($_POST['photo_wall_bing_order']), true)
+                        : array();
+                    update_option(WP_PHOTO_WALL_BING_ORDER_OPTION, wp_photo_wall_bing_sanitize_order($bing_order_raw));
+
+                    update_option(WP_PHOTO_WALL_BING_CRON_ENABLED_OPTION, isset($_POST['photo_wall_bing_cron_enabled']) ? '1' : '0');
+
+                    $bing_cron_hour = isset($_POST['photo_wall_bing_cron_hour'])
+                        ? (int) $_POST['photo_wall_bing_cron_hour']
+                        : WP_PHOTO_WALL_BING_CRON_DEFAULT_HOUR;
+                    if ($bing_cron_hour < 0) $bing_cron_hour = 0;
+                    if ($bing_cron_hour > 23) $bing_cron_hour = 23;
+                    update_option(WP_PHOTO_WALL_BING_CRON_HOUR_OPTION, $bing_cron_hour);
+
+                    // Re-arm the daily event so the new time takes effect at once.
+                    wp_photo_wall_bing_cron_schedule();
+
+                    $bing_download_url = isset($_POST['photo_wall_bing_download_url'])
+                        ? wp_photo_wall_bing_sanitize_download_url(wp_unslash($_POST['photo_wall_bing_download_url']))
+                        : '';
+                    update_option(WP_PHOTO_WALL_BING_DOWNLOAD_URL_OPTION, $bing_download_url);
+
+                    $bing_download_text = isset($_POST['photo_wall_bing_download_text'])
+                        ? wp_photo_wall_bing_sanitize_download_text(wp_unslash($_POST['photo_wall_bing_download_text']))
+                        : '';
+                    update_option(WP_PHOTO_WALL_BING_DOWNLOAD_TEXT_OPTION, $bing_download_text);
                 }
 
                 // What the plugin still references after this save (wall + carousel).

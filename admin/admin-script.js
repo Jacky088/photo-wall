@@ -81,12 +81,76 @@ jQuery(document).ready(function ($) {
         $('.wp-photo-wall-save-btn, #submit').removeClass('wp-photo-wall-btn-pulse');
     }
 
-    // Warn before leaving with unsaved changes
+    // Every settings field feeds the same "save to apply" flow: touching it
+    // marks the page as dirty until the form is actually submitted.
+    var $settingsFields = $('#wp-photo-wall-form')
+        .find('input[type="checkbox"], input[type="text"], input[type="url"], input[type="number"], select, textarea')
+        .not('#wp-photo-wall-new-group-name, #wp-photo-wall-external-url, #wp-photo-wall-confirm-word, #wp-photo-wall-move-target');
+
+    $settingsFields.on('change input', function () {
+        markDirty();
+    });
+
+    /**
+     * Leave guard. The browser dialog covers closing / reloading / typing a new
+     * address, while in-page links get our own dialog so the wording matches
+     * the plugin ("Save Changes" is required for anything to apply).
+     */
+    function leaveMessage() {
+        return (wp_photo_wall_ajax.labels && wp_photo_wall_ajax.labels.leave_confirm) || '';
+    }
+
+    var $leaveModal = $('#wp-photo-wall-leave-modal');
+    var pendingLeaveUrl = '';
+
     $(window).on('beforeunload', function (e) {
-        if (isDirty) {
-            e.preventDefault();
-            return '';
+        if (!isDirty) return;
+
+        var message = leaveMessage();
+        if (e.originalEvent) {
+            e.originalEvent.returnValue = message;
         }
+        e.preventDefault();
+        return message;
+    });
+
+    $(document).on('click', 'a[href]', function (e) {
+        if (!isDirty) return;
+        // Let the browser handle new-tab / new-window / middle clicks.
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+
+        var $link = $(this);
+        var href = $link.attr('href');
+        if (!href || href.charAt(0) === '#') return;      // in-page anchor
+        if ($link.hasClass('nav-tab')) return;            // tab switch, same page
+        if ($link.closest('.wp-photo-wall-modal').length) return;
+        if ($link.attr('target') && $link.attr('target') !== '_self') return;
+
+        e.preventDefault();
+        pendingLeaveUrl = href;
+        $leaveModal.prop('hidden', false);
+    });
+
+    $leaveModal.on('click', '.wp-photo-wall-leave-stay', function () {
+        pendingLeaveUrl = '';
+        $leaveModal.prop('hidden', true);
+
+        // Point the user at the save button of the tab they are on.
+        var $btn = $('.wp-photo-wall-tab-panel:not([hidden])').find('.wp-photo-wall-save-btn, #submit').first();
+        if ($btn.length && $btn[0].scrollIntoView) {
+            $btn[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
+
+    $leaveModal.on('click', '.wp-photo-wall-leave-discard', function () {
+        if (!pendingLeaveUrl) {
+            $leaveModal.prop('hidden', true);
+            return;
+        }
+        // Dropped on purpose: the page is left as-is, so the pending edits are
+        // simply gone and the last saved state is restored on the next visit.
+        markClean();
+        window.location.href = pendingLeaveUrl;
     });
 
     // Clear dirty on form submit
@@ -1039,5 +1103,179 @@ jQuery(document).ready(function ($) {
     // Initial render + sortable
     renderSlides();
     initSlidesSortable();
+
+    // ==========================================
+    // Bing Wallpaper tab
+    // ==========================================
+    var $bingApiInput = $('#photo_wall_bing_api');
+    var $bingList = $('#wp-photo-wall-bing-list');
+    var $bingOrderInput = $('#photo_wall_bing_order');
+    var $bingRefreshBtn = $('#wp-photo-wall-bing-refresh');
+    var $bingResetBtn = $('#wp-photo-wall-bing-reset');
+    var $bingStatus = $('#wp-photo-wall-bing-status');
+    // Last fetched list, always kept in natural (newest first) order.
+    var bingNatural = [];
+
+    function getBingOrder() {
+        try {
+            var parsed = JSON.parse($bingOrderInput.val() || '[]');
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function setBingOrder(keys) {
+        $bingOrderInput.val(JSON.stringify(keys));
+    }
+
+    function syncBingOrderFromDOM() {
+        var keys = [];
+        $bingList.find('.wp-pw-bing-item').each(function () {
+            keys.push(String($(this).data('key')));
+        });
+        setBingOrder(keys);
+    }
+
+    function applyBingOrder(items) {
+        var order = getBingOrder();
+        if (!order.length) return items;
+
+        var map = {};
+        items.forEach(function (item) { map[item.key] = item; });
+
+        var sorted = [];
+        order.forEach(function (key) {
+            if (map[key]) {
+                sorted.push(map[key]);
+                delete map[key];
+            }
+        });
+        // Wallpapers not covered by the saved order (new days) keep date order.
+        items.forEach(function (item) {
+            if (map[item.key]) sorted.push(item);
+        });
+        return sorted;
+    }
+
+    function renderBing(items) {
+        if (!$bingList.length) return;
+
+        if (Array.isArray(items)) bingNatural = items;
+        var ordered = applyBingOrder(bingNatural);
+
+        if (!ordered.length) {
+            $bingList.html('<li class="wp-pw-bing-empty">' +
+                escapeHtml(wp_photo_wall_ajax.labels.bing_empty || 'No wallpapers found.') + '</li>');
+            syncBingOrderFromDOM();
+            return;
+        }
+
+        var html = '';
+        ordered.forEach(function (item) {
+            var label = item.date || '';
+            if (item.title) {
+                label = label ? label + ' · ' + item.title : item.title;
+            }
+            html += '<li class="wp-pw-bing-item" data-key="' + escapeHtml(item.key) + '"' +
+                ' title="' + escapeHtml(item.copyright || label) + '">' +
+                '<span class="wp-pw-bing-handle" title="' + escapeHtml(wp_photo_wall_ajax.labels.drag || '') + '">&#8942;&#8942;</span>' +
+                '<img class="wp-pw-bing-thumb" src="' + escapeHtml(item.thumb) + '" alt=""' +
+                ' data-full="' + escapeHtml(item.full) + '" decoding="async" loading="lazy">' +
+                '<span class="wp-pw-bing-meta">' + escapeHtml(label) + '</span>' +
+                '</li>';
+        });
+        $bingList.html(html);
+        syncBingOrderFromDOM();
+    }
+
+    // Thumbnails come from a third-party host: fall back to the full image.
+    if ($bingList.length) {
+        $bingList[0].addEventListener('error', function (e) {
+            var el = e.target;
+            if (!el || el.tagName !== 'IMG' || !$(el).hasClass('wp-pw-bing-thumb')) return;
+            var full = el.getAttribute('data-full');
+            if (full && el.getAttribute('src') !== full) {
+                el.setAttribute('src', full);
+            }
+        }, true);
+    }
+
+    // Seed the in-memory list from the server-rendered markup so "Restore Date
+    // Order" also works before the first manual refresh.
+    function seedBingFromDOM() {
+        var items = [];
+        $bingList.find('.wp-pw-bing-item').each(function () {
+            var $li = $(this);
+            var $img = $li.find('.wp-pw-bing-thumb');
+            items.push({
+                key: String($li.data('key')),
+                thumb: $img.attr('src') || '',
+                full: $img.attr('data-full') || '',
+                title: $li.find('.wp-pw-bing-meta').text() || '',
+                copyright: $li.attr('title') || '',
+                date: ''
+            });
+        });
+        // Newest first (keys are "d20260915" for dated entries).
+        items.sort(function (a, b) {
+            return a.key < b.key ? 1 : (a.key > b.key ? -1 : 0);
+        });
+        return items;
+    }
+
+    function initBingSortable() {
+        if (!$.fn.sortable || !$bingList.length) return;
+        $bingList.sortable({
+            handle: '.wp-pw-bing-handle',
+            items: '.wp-pw-bing-item',
+            placeholder: 'wp-pw-bing-placeholder',
+            forcePlaceholderSize: true,
+            tolerance: 'pointer',
+            update: function () {
+                syncBingOrderFromDOM();
+                markDirty();
+            }
+        }).disableSelection();
+    }
+
+    function setBingStatus(text) {
+        if ($bingStatus.length) $bingStatus.text(text);
+    }
+
+    $bingResetBtn.on('click', function () {
+        setBingOrder([]);
+        renderBing();
+        markDirty();
+    });
+
+    $bingRefreshBtn.on('click', function () {
+        if (!$bingList.length) return;
+
+        var L = wp_photo_wall_ajax.labels;
+        $bingRefreshBtn.prop('disabled', true).text(L.bing_refreshing || '');
+
+        $.post(ajaxurl, {
+            action: 'wp_photo_wall_bing_refresh',
+            nonce: wp_photo_wall_ajax.bing_nonce || '',
+            api: $bingApiInput.val()
+        }).done(function (response) {
+            if (response && response.success) {
+                renderBing(response.data.items || []);
+                setBingStatus(response.data.updated || '');
+            } else {
+                setBingStatus(L.bing_fetch_failed || (L.ajax_error || ''));
+            }
+        }).fail(function () {
+            setBingStatus(L.bing_fetch_failed || (L.ajax_error || ''));
+        }).always(function () {
+            $bingRefreshBtn.prop('disabled', false).text(L.bing_refresh || '');
+        });
+    });
+
+    if ($bingList.length) {
+        bingNatural = seedBingFromDOM();
+    }
+    initBingSortable();
 
 });

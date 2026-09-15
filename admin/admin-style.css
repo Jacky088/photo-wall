@@ -419,6 +419,42 @@
     background: #fff;
 }
 
+/* Section heading inside a settings table */
+.wp-photo-wall-section-head {
+    padding-top: 24px;
+    padding-bottom: 0;
+    border-top: 1px solid #dcdcde;
+}
+
+.wp-photo-wall-section-head h3 {
+    margin: 0;
+}
+
+.wp-photo-wall-section-head .description {
+    margin: 4px 0 0;
+    font-weight: 400;
+}
+
+/* Leave confirmation dialog */
+.wp-photo-wall-leave-message {
+    margin: 12px 0 0;
+    color: #3c434a;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+#wp-photo-wall-leave-modal .submit {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 0;
+}
+
+#wp-photo-wall-leave-modal .button-link-delete {
+    margin-left: auto;
+}
+
 #wp-photo-wall-external-preview {
     min-height: 120px;
     margin-top: 12px;
@@ -533,4 +569,202 @@
     max-width: 100%;
     height: 34px;
     margin-top: 12px;
+}
+
+/* Bing wallpaper tab: API response format documentation */
+.wp-pw-bing-hint {
+    margin: 10px 0 4px;
+    max-width: 720px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 6px;
+}
+
+.wp-pw-bing-hint > summary {
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #2271b1;
+    font-size: 13px;
+    font-weight: 600;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.wp-pw-bing-hint > summary::-webkit-details-marker {
+    display: none;
+}
+
+.wp-pw-bing-hint > summary::before {
+    content: "\25B8";
+    display: inline-block;
+    font-size: 12px;
+    transition: transform 0.15s ease;
+}
+
+.wp-pw-bing-hint[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.wp-pw-bing-hint > summary:hover {
+    background: #f6f7f7;
+}
+
+.wp-pw-bing-hint-body {
+    padding: 4px 14px 14px;
+    border-top: 1px solid #f0f0f1;
+    color: #3c434a;
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.wp-pw-bing-hint-body h4 {
+    margin: 16px 0 6px;
+    font-size: 13px;
+    color: #1d2327;
+}
+
+.wp-pw-bing-hint-body p,
+.wp-pw-bing-hint-body ul {
+    margin: 0 0 6px;
+}
+
+.wp-pw-bing-hint-body ul {
+    padding-left: 20px;
+    list-style: disc;
+}
+
+.wp-pw-bing-hint-body li {
+    margin-bottom: 4px;
+}
+
+.wp-pw-bing-hint-body code {
+    padding: 1px 5px;
+    background: #f0f0f1;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.wp-pw-bing-hint-code {
+    display: block;
+    margin: 6px 0 0;
+    padding: 10px 12px;
+    max-width: 100%;
+    overflow-x: auto;
+    background: #1d2327;
+    color: #f0f0f1;
+    border-radius: 4px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre;
+    tab-size: 2;
+}
+
+/* Bing wallpaper tab */
+.wp-photo-wall-bing-card .form-table th {
+    width: 180px;
+    padding: 12px 10px 12px 0;
+}
+
+.wp-pw-bing-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 16px 0 12px;
+}
+
+.wp-pw-bing-status {
+    margin-left: auto;
+    font-size: 12px;
+    color: #646970;
+    white-space: nowrap;
+}
+
+.wp-pw-bing-list {
+    list-style: none;
+    margin: 0;
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: 60px;
+    background: #f6f7f7;
+    border: 1px dashed #c3c4c7;
+    border-radius: 6px;
+}
+
+/* Wider than the 110px photo tiles so the 16:9 wallpapers stay readable. */
+.wp-pw-bing-item {
+    position: relative;
+    box-sizing: border-box;
+    width: 190px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 5px;
+    overflow: hidden;
+    cursor: default;
+}
+
+.wp-pw-bing-placeholder {
+    width: 190px;
+    height: 107px;
+    background: #e2e4e7;
+    border: 1px dashed #8c8f94;
+    border-radius: 5px;
+}
+
+.wp-pw-bing-handle {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    cursor: grab;
+    font-size: 15px;
+    line-height: 1;
+    user-select: none;
+    transition: background-color 0.15s ease;
+}
+
+.wp-pw-bing-handle:hover {
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.wp-pw-bing-handle:active {
+    cursor: grabbing;
+}
+
+.wp-pw-bing-thumb {
+    display: block;
+    width: 100%;
+    height: 107px;
+    object-fit: cover;
+    background: #eee;
+}
+
+.wp-pw-bing-meta {
+    display: block;
+    padding: 6px 8px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #50575e;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+.wp-pw-bing-empty {
+    padding: 18px;
+    color: #646970;
+    font-size: 13px;
 }

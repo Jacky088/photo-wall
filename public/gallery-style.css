@@ -411,6 +411,40 @@ body.wp-photo-wall-lightbox-open { overflow: hidden; }
     color: #fff !important;
 }
 
+/* Download button below the wallpapers (blue rounded rectangle, centered) */
+.wp-photo-wall-bing-download {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    max-width: 100%;
+    margin: 24px auto 8px;
+    padding: 12px 26px;
+    background: #2271b1;
+    color: #fff !important;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.4;
+    box-shadow: 0 6px 16px rgba(34, 113, 177, 0.28);
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.wp-photo-wall-bing-download:hover,
+.wp-photo-wall-bing-download:focus {
+    background: #135e96;
+    color: #fff !important;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34, 113, 177, 0.34);
+}
+
+.wp-photo-wall-bing-download:active {
+    transform: translateY(0);
+}
+
 .wp-photo-wall-download-btn .dashicons {
     font-size: 20px;
     width: 20px;
@@ -453,8 +487,14 @@ body.wp-photo-wall-lightbox-open { overflow: hidden; }
     .wp-photo-wall-close,
     .wp-photo-wall-prev,
     .wp-photo-wall-next,
-    .wp-photo-wall-download-btn {
+    .wp-photo-wall-download-btn,
+    .wp-photo-wall-bing-download {
         transition: none;
+    }
+
+    .wp-photo-wall-bing-download:hover,
+    .wp-photo-wall-bing-download:focus {
+        transform: none;
     }
 
     .wp-photo-wall-item img {

@@ -104,6 +104,14 @@ function wp_photo_wall_get_visible_items()
             $visible[] = $item;
         }
     }
+
+    // Bing wallpapers are a virtual group: always appended after the last
+    // custom group (and therefore the only group when none is defined).
+    $bing_items = wp_photo_wall_bing_get_items();
+    if ($bing_items) {
+        $visible = array_merge($visible, $bing_items);
+    }
+
     return $visible;
 }
 

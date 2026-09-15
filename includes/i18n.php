@@ -348,6 +348,33 @@ function wp_photo_wall_text($key)
             'zh_CN' => '有未保存的更改！',
             'zh_TW' => '有未保存的更改！'
         ),
+
+        // Leave-without-saving guard
+        'leave_confirm' => array(
+            'en' => 'Your changes have not been saved yet. Leave this page anyway?',
+            'zh_CN' => '你的修改尚未保存，确定要离开本页吗？',
+            'zh_TW' => '你的修改尚未儲存，確定要離開本頁嗎？'
+        ),
+        'leave_confirm_title' => array(
+            'en' => 'Unsaved Changes',
+            'zh_CN' => '尚未保存更改',
+            'zh_TW' => '尚未儲存變更'
+        ),
+        'leave_confirm_message' => array(
+            'en' => 'Your changes only take effect after clicking "Save Changes". If you leave now, they will be lost and the page will fall back to the last saved state.',
+            'zh_CN' => '所有更改都必须点击「保存更改」才会生效。若现在离开，未保存的内容将会丢失，页面将退回上一次保存的状态。',
+            'zh_TW' => '所有更改都必須點擊「儲存變更」才會生效。若現在離開，未儲存的內容將會遺失，頁面將退回上一次儲存的狀態。'
+        ),
+        'leave_stay' => array(
+            'en' => 'Stay and Save',
+            'zh_CN' => '留在本页保存',
+            'zh_TW' => '留在本頁儲存'
+        ),
+        'leave_discard' => array(
+            'en' => 'Discard and Leave',
+            'zh_CN' => '放弃更改并离开',
+            'zh_TW' => '放棄變更並離開'
+        ),
         'clear_all_confirm_text' => array(
             'en' => 'Type CONFIRM to clear all photos:',
             'zh_CN' => '输入 CONFIRM 以确认清空所有图片：',
@@ -588,6 +615,251 @@ function wp_photo_wall_text($key)
             'en' => 'Settings saved. %d media file(s) were permanently deleted from the Media Library.',
             'zh_CN' => '设置已保存,并已从媒体库永久删除 %d 个图片文件。',
             'zh_TW' => '設定已保存,並已從媒體庫永久刪除 %d 個圖片檔案。'
+        ),
+
+        // Bing wallpaper module
+        'tab_bing' => array(
+            'en' => 'Bing Wallpaper',
+            'zh_CN' => '必应壁纸',
+            'zh_TW' => '必應壁紙'
+        ),
+        'bing_title' => array(
+            'en' => 'Bing Wallpaper',
+            'zh_CN' => '必应壁纸',
+            'zh_TW' => '必應壁紙'
+        ),
+        'bing_desc' => array(
+            'en' => 'Pulls the latest %d days of Bing wallpapers through the API below. They are appended as the very last group on the photo wall. If you have no custom group, only the wallpapers are shown.',
+            'zh_CN' => '通过下方接口拉取最近 %d 天的必应壁纸，并自动追加到图片墙的最后一个分组。若你没有自定义分组，则只显示必应壁纸。',
+            'zh_TW' => '通過下方介面拉取最近 %d 天的必應壁紙，並自動追加到圖片牆的最後一個分組。若你沒有自訂分組，則只顯示必應壁紙。'
+        ),
+        'bing_enable' => array(
+            'en' => 'Enable',
+            'zh_CN' => '启用',
+            'zh_TW' => '啟用'
+        ),
+        'bing_enable_label' => array(
+            'en' => 'Show the Bing wallpaper group on the frontend',
+            'zh_CN' => '在前端显示必应壁纸分组',
+            'zh_TW' => '在前端顯示必應壁紙分組'
+        ),
+        'bing_api' => array(
+            'en' => 'API Endpoint',
+            'zh_CN' => 'API 接口地址',
+            'zh_TW' => 'API 介面地址'
+        ),
+        'bing_api_desc' => array(
+            'en' => 'Any Bing-compatible JSON endpoint works. Leave empty to restore the default. Results are cached for 6 hours; use "Refresh" to pull immediately.',
+            'zh_CN' => '可填写任意必应兼容的 JSON 接口，留空则恢复默认地址。结果缓存 6 小时，可点击「重新拉取」立即更新。',
+            'zh_TW' => '可填寫任意必應相容的 JSON 介面，留空則恢復預設地址。結果快取 6 小時，可點擊「重新拉取」立即更新。'
+        ),
+        'bing_group_name' => array(
+            'en' => 'Group Title',
+            'zh_CN' => '前端分组标题',
+            'zh_TW' => '前端分組標題'
+        ),
+        'bing_group_default' => array(
+            'en' => 'Bing Wallpaper',
+            'zh_CN' => '必应壁纸',
+            'zh_TW' => '必應壁紙'
+        ),
+        'bing_refresh' => array(
+            'en' => 'Refresh Now',
+            'zh_CN' => '重新拉取',
+            'zh_TW' => '重新拉取'
+        ),
+        'bing_refreshing' => array(
+            'en' => 'Fetching...',
+            'zh_CN' => '拉取中...',
+            'zh_TW' => '拉取中...'
+        ),
+        'bing_reset_order' => array(
+            'en' => 'Restore Date Order',
+            'zh_CN' => '恢复时间排序',
+            'zh_TW' => '恢復時間排序'
+        ),
+        'bing_order_hint' => array(
+            'en' => 'Shown newest first by default. Drag the tiles to change the order; click "Save Changes" to apply.',
+            'zh_CN' => '默认按时间倒序（最新在前）显示，拖拽可调整顺序，点击「保存更改」后生效。',
+            'zh_TW' => '預設依時間倒序（最新在前）顯示，拖曳可調整順序，點擊「儲存變更」後生效。'
+        ),
+        'bing_last_update' => array(
+            'en' => 'Last updated: %s',
+            'zh_CN' => '最后更新：%s',
+            'zh_TW' => '最後更新：%s'
+        ),
+        'bing_never' => array(
+            'en' => 'Never',
+            'zh_CN' => '尚未拉取',
+            'zh_TW' => '尚未拉取'
+        ),
+        'bing_empty' => array(
+            'en' => 'No wallpapers returned. Please check the API endpoint and try again.',
+            'zh_CN' => '未拉取到任何壁纸，请检查接口地址后重试。',
+            'zh_TW' => '未拉取到任何壁紙，請檢查介面地址後重試。'
+        ),
+        'bing_fetch_failed' => array(
+            'en' => 'Fetch failed. Please check the API endpoint or try again later.',
+            'zh_CN' => '拉取失败，请检查接口地址或稍后重试。',
+            'zh_TW' => '拉取失敗，請檢查介面地址或稍後重試。'
+        ),
+        'bing_updated' => array(
+            'en' => 'Fetched %d wallpaper(s).',
+            'zh_CN' => '已拉取 %d 张壁纸。',
+            'zh_TW' => '已拉取 %d 張壁紙。'
+        ),
+
+        // API response format documentation
+        'bing_api_hint_toggle' => array(
+            'en' => 'API response format (click to expand)',
+            'zh_CN' => '接口返回格式要求（点击展开）',
+            'zh_TW' => '介面回傳格式要求（點擊展開）'
+        ),
+        'bing_api_hint_intro' => array(
+            'en' => 'The endpoint must answer a plain GET request with JSON. The plugin only reads the wallpaper array inside the response; every other field is ignored.',
+            'zh_CN' => '接口需要通过 GET 请求返回 JSON 数据。插件只解析其中的壁纸数组，其余字段会被忽略。',
+            'zh_TW' => '介面需要透過 GET 請求回傳 JSON 資料。插件只解析其中的壁紙陣列，其餘欄位會被忽略。'
+        ),
+        'bing_api_hint_container' => array(
+            'en' => '1. Where the wallpaper array lives',
+            'zh_CN' => '1. 壁纸数组所在层级',
+            'zh_TW' => '1. 壁紙陣列所在層級'
+        ),
+        'bing_api_hint_container_desc' => array(
+            'en' => 'The plugin looks for these keys in order: images, data, list, results, wallpapers. If none of them exists, the response itself is treated as the array.',
+            'zh_CN' => '插件按顺序依次查找 images、data、list、results、wallpapers 这几个键；若都不存在，则把整个返回结果当作数组处理。',
+            'zh_TW' => '插件依序查找 images、data、list、results、wallpapers 這幾個鍵；若都不存在，則把整個回傳結果當作陣列處理。'
+        ),
+        'bing_api_hint_fields' => array(
+            'en' => '2. Supported fields per wallpaper',
+            'zh_CN' => '2. 单张壁纸支持的字段',
+            'zh_TW' => '2. 單張壁紙支援的欄位'
+        ),
+        'bing_api_hint_field_url' => array(
+            'en' => 'url (required): full image address. Bing returns a relative path such as /th?id=OHR.Name_1920x1080.jpg&rf=...&pid=hp, which is completed with the endpoint host automatically. If url is missing the plugin falls back to full, image, src, img, download_url, thumbnail.',
+            'zh_CN' => 'url（必填）：图片完整地址。必应官方返回的是相对路径，如 /th?id=OHR.Name_1920x1080.jpg&rf=...&pid=hp，插件会自动用接口域名补全为绝对地址。若没有 url，会依次尝试 full、image、src、img、download_url、thumbnail。',
+            'zh_TW' => 'url（必填）：圖片完整地址。必應官方回傳的是相對路徑，如 /th?id=OHR.Name_1920x1080.jpg&rf=...&pid=hp，插件會自動用介面網域補全為絕對地址。若沒有 url，會依序嘗試 full、image、src、img、download_url、thumbnail。'
+        ),
+        'bing_api_hint_field_urlbase' => array(
+            'en' => 'urlbase (optional): the resolution-less image base, e.g. /th?id=OHR.Name. It is used to build the 400x240 (admin) and 800x600 (frontend grid) thumbnails. When it is missing the thumbnails simply use url.',
+            'zh_CN' => 'urlbase（可选）：去掉分辨率后缀的图片基址，如 /th?id=OHR.Name。插件据此自动生成 400×240（后台缩略图）和 800×600（前台网格）缩略图；不提供时缩略图直接使用 url。',
+            'zh_TW' => 'urlbase（選填）：去掉解析度後綴的圖片基底，如 /th?id=OHR.Name。插件據此自動產生 400×240（後台縮圖）與 800×600（前台網格）縮圖；未提供時縮圖直接使用 url。'
+        ),
+        'bing_api_hint_field_date' => array(
+            'en' => 'startdate (optional): wallpaper date in YYYYMMDD form, e.g. 20260915. It drives the newest-first sorting and acts as the stable id that remembers your drag order. date and enddate are accepted as fallbacks.',
+            'zh_CN' => 'startdate（可选）：壁纸日期，格式为 YYYYMMDD，如 20260915。它决定按时间倒序排序，并作为唯一标识记住你的拖拽顺序。也接受 date 或 enddate。',
+            'zh_TW' => 'startdate（選填）：壁紙日期，格式為 YYYYMMDD，如 20260915。它決定依時間倒序排序，並作為唯一識別記住你的拖曳順序。也接受 date 或 enddate。'
+        ),
+        'bing_api_hint_field_title' => array(
+            'en' => 'title (optional): wallpaper title, shown together with the date below the admin thumbnail.',
+            'zh_CN' => 'title（可选）：壁纸标题，与日期一起显示在后台缩略图下方。',
+            'zh_TW' => 'title（選填）：壁紙標題，與日期一起顯示在後台縮圖下方。'
+        ),
+        'bing_api_hint_field_copyright' => array(
+            'en' => 'copyright (optional): copyright / description text, shown as a tooltip on the admin thumbnail. description, desc and caption are accepted as fallbacks.',
+            'zh_CN' => 'copyright（可选）：版权或描述文字，鼠标悬停后台缩略图时显示。也接受 description、desc、caption。',
+            'zh_TW' => 'copyright（選填）：版權或描述文字，滑鼠懸停後台縮圖時顯示。也接受 description、desc、caption。'
+        ),
+        'bing_api_hint_notes' => array(
+            'en' => '3. Other rules' . "\n" .
+                'Only the first %d entries are used, the rest is ignored.' . "\n" .
+                'Entries are sorted by startdate, newest first. Without a date the original order is kept.' . "\n" .
+                'Response must be UTF-8; a JSONP wrapper is unwrapped automatically.' . "\n" .
+                'Both the endpoint and the image URLs must be reachable directly by the visitor browser (hotlinking must be allowed); HTTPS is recommended.' . "\n" .
+                'Successful responses are cached for 6 hours. Use "Refresh Now" to pull immediately; a failed request is retried after 5 minutes.',
+            'zh_CN' => '3. 其它规则' . "\n" .
+                '只取数组前 %d 条，超出部分忽略。' . "\n" .
+                '按 startdate 倒序排列（最新在前）；未提供日期时保持接口返回的原始顺序。' . "\n" .
+                '返回内容需为 UTF-8；若接口使用 JSONP 包裹，插件会自动剥离外层回调。' . "\n" .
+                '接口与图片地址都必须允许访客浏览器直接访问（即支持直链/外链），建议使用 HTTPS。' . "\n" .
+                '成功结果缓存 6 小时，可点「重新拉取」立即更新；拉取失败后 5 分钟才会再次请求。',
+            'zh_TW' => '3. 其它規則' . "\n" .
+                '只取陣列前 %d 條，超出部分忽略。' . "\n" .
+                '依 startdate 倒序排列（最新在前）；未提供日期時維持介面回傳的原始順序。' . "\n" .
+                '回傳內容需為 UTF-8；若介面使用 JSONP 包裹，插件會自動剝離外層回呼。' . "\n" .
+                '介面與圖片地址都必須允許訪客瀏覽器直接存取（即支援直連/外連），建議使用 HTTPS。' . "\n" .
+                '成功結果快取 6 小時，可點「重新拉取」立即更新；拉取失敗後 5 分鐘才會再次請求。'
+        ),
+        // Daily automatic pull (WP-Cron)
+        'bing_cron_enable' => array(
+            'en' => 'Auto Update',
+            'zh_CN' => '自动更新',
+            'zh_TW' => '自動更新'
+        ),
+        'bing_cron_enable_label' => array(
+            'en' => 'Automatically pull the newest wallpapers once every day',
+            'zh_CN' => '每天自动拉取一次最新壁纸',
+            'zh_TW' => '每天自動拉取一次最新壁紙'
+        ),
+        'bing_cron_hour' => array(
+            'en' => 'Run At',
+            'zh_CN' => '执行时间',
+            'zh_TW' => '執行時間'
+        ),
+        'bing_cron_desc' => array(
+            'en' => 'Scheduled with WP-Cron, so it only fires while the site receives traffic. For exact timing, disable WP-Cron and add a real system cron job.',
+            'zh_CN' => '基于 WordPress 定时任务（WP-Cron），需要有访问量时才会触发；若需精确执行，请为站点配置系统级 crontab。',
+            'zh_TW' => '基於 WordPress 定時任務（WP-Cron），需要有流量時才會觸發；若需精確執行，請為站台設定系統級 crontab。'
+        ),
+        'bing_cron_next' => array(
+            'en' => 'Next run: %s',
+            'zh_CN' => '下次执行：%s',
+            'zh_TW' => '下次執行：%s'
+        ),
+        'bing_cron_last' => array(
+            'en' => 'Last automatic pull: %s',
+            'zh_CN' => '上次自动拉取：%s',
+            'zh_TW' => '上次自動拉取：%s'
+        ),
+        'bing_cron_not_scheduled' => array(
+            'en' => 'Not scheduled',
+            'zh_CN' => '未安排',
+            'zh_TW' => '未安排'
+        ),
+        'bing_download_url' => array(
+            'en' => 'Download Button Link',
+            'zh_CN' => '下载按钮链接',
+            'zh_TW' => '下載按鈕鏈接'
+        ),
+        'bing_download_section' => array(
+            'en' => 'Download Button',
+            'zh_CN' => '下载按钮',
+            'zh_TW' => '下載按鈕'
+        ),
+        'bing_download_section_desc' => array(
+            'en' => 'Only applies to the Bing wallpaper group. The button is hidden when the group is disabled, when no wallpaper was fetched, or when the link below is empty.',
+            'zh_CN' => '仅适用于必应壁纸。关闭必应壁纸、暂未拉到壁纸或链接留空时，前端都不会显示该按钮。',
+            'zh_TW' => '僅適用於必應壁紙。關閉必應壁紙、尚未取得壁紙或鏈接留空時，前端都不會顯示該按鈕。'
+        ),
+        'bing_download_url_desc' => array(
+            'en' => 'Fill in a link to show the download button right below the Bing wallpapers on the frontend. Leave empty to hide the button.',
+            'zh_CN' => '填写后，前端会在必应壁纸下方显示下载按钮；留空则不显示。',
+            'zh_TW' => '填寫後，前端會在必應壁紙下方顯示下載按鈕；留空則不顯示。'
+        ),
+        'bing_download_text' => array(
+            'en' => 'Download Button Label',
+            'zh_CN' => '下载按钮名称',
+            'zh_TW' => '下載按鈕名稱'
+        ),
+        'bing_download_text_desc' => array(
+            'en' => 'Leave empty to use the default label.',
+            'zh_CN' => '留空则使用默认名称「下载壁纸」。',
+            'zh_TW' => '留空則使用預設名稱「下載壁紙」。'
+        ),
+        'bing_download_default' => array(
+            'en' => 'Download Wallpapers',
+            'zh_CN' => '下载壁纸',
+            'zh_TW' => '下載壁紙'
+        ),
+        'bing_api_default_hint' => array(
+            'en' => 'Leave the field empty to fall back to the official Bing endpoint (no API key required):',
+            'zh_CN' => '留空则恢复为必应官方接口（无需密钥）：',
+            'zh_TW' => '留空則恢復為必應官方介面（無需金鑰）：'
+        ),
+        'bing_api_hint_example' => array(
+            'en' => '4. Minimal working response',
+            'zh_CN' => '4. 最小可用返回示例',
+            'zh_TW' => '4. 最小可用回傳範例'
         ),
     );
 
