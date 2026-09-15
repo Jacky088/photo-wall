@@ -4,7 +4,9 @@
 
 ## 页面预览
 
-![photowall 预览](./screenshot-preview-pc-photowall.jpg)
+<p align="center">
+  <a href="./screenshot-preview-pc-photowall.jpg"><img src="./screenshot-preview-pc-photowall.jpg" alt="图片墙页面预览" width="680"></a>
+</p>
 
 ## ✨ 特性
 
