@@ -827,9 +827,9 @@ function wp_photo_wall_text($key)
             'zh_TW' => '下載按鈕'
         ),
         'bing_download_section_desc' => array(
-            'en' => 'Only applies to the Bing wallpaper group. The button is hidden when the group is disabled, when no wallpaper was fetched, or when the link below is empty.',
-            'zh_CN' => '仅适用于必应壁纸。关闭必应壁纸、暂未拉到壁纸或链接留空时，前端都不会显示该按钮。',
-            'zh_TW' => '僅適用於必應壁紙。關閉必應壁紙、尚未取得壁紙或鏈接留空時，前端都不會顯示該按鈕。'
+            'en' => 'Only applies to the Bing wallpaper group and always sits right below it. The button is hidden when the group is disabled, when no wallpaper was fetched, or when the link below is empty.',
+            'zh_CN' => '仅适用于必应壁纸，且始终紧跟在必应壁纸分组下方。关闭必应壁纸、暂未拉到壁纸或链接留空时，前端都不会显示该按钮。',
+            'zh_TW' => '僅適用於必應壁紙，且始終緊跟在必應壁紙分組下方。關閉必應壁紙、尚未取得壁紙或鏈接留空時，前端都不會顯示該按鈕。'
         ),
         'bing_download_url_desc' => array(
             'en' => 'Fill in a link to show the download button right below the Bing wallpapers on the frontend. Leave empty to hide the button.',

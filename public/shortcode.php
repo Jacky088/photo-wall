@@ -8,12 +8,15 @@ $instance_id = wp_unique_id('wp-photo-wall-');
 $batch = array_slice($all_items, 0, 12);
 $last_gid = null;
 $open = false;
+// Whether this first batch already reaches the Bing wallpaper group.
+$batch_has_bing = false;
 ?>
 <section id="<?php echo esc_attr($instance_id); ?>" class="wp-photo-wall-instance" data-page="1">
     <?php echo wp_photo_wall_render_slider($instance_id); ?>
     <div class="wp-photo-wall-wrapper">
     <?php foreach ($batch as $index => $item) :
         $gid = $item['group_id'];
+        if ($gid === WP_PHOTO_WALL_BING_GROUP_ID) $batch_has_bing = true;
         if ($gid !== $last_gid) {
             if ($open) echo '</div></div>';
             echo '<div class="wp-photo-wall-group-section" data-group-id="' . esc_attr($gid) . '">';
@@ -39,10 +42,15 @@ $open = false;
     <?php endif; ?>
 
     <?php
-    // Download button shown right below the wallpapers (the Bing group is
-    // always the last one). Hidden while no link is configured.
-    echo wp_photo_wall_bing_download_button();
+    // Download button for the Bing wallpapers. It belongs under that group, so
+    // when the group only arrives with a later batch the button is printed
+    // hidden and the frontend script reveals it once the group is rendered.
+    $bing_button = wp_photo_wall_bing_download_button(!$batch_has_bing);
+    echo $bing_button;
     ?>
+    <?php if ($bing_button !== '' && !$batch_has_bing) : ?>
+        <noscript><style>.wp-photo-wall-bing-download-pending { display: flex; }</style></noscript>
+    <?php endif; ?>
 
     <?php $download_link = get_option('wp_photo_wall_download_link', ''); if ($download_link) : ?>
         <a href="<?php echo esc_url($download_link); ?>" class="wp-photo-wall-download-btn" target="_blank" rel="noopener noreferrer"><?php echo esc_html(wp_photo_wall_text('download_all')); ?></a>

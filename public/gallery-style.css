@@ -445,6 +445,12 @@ body.wp-photo-wall-lightbox-open { overflow: hidden; }
     transform: translateY(0);
 }
 
+/* Waiting state: the Bing group has not been rendered yet (it arrives with a
+   later batch), so the button stays hidden until the script parks it below. */
+.wp-photo-wall-bing-download-pending {
+    display: none;
+}
+
 .wp-photo-wall-download-btn .dashicons {
     font-size: 20px;
     width: 20px;

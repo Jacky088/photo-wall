@@ -99,9 +99,13 @@ function wp_photo_wall_bing_download_text()
  * The button belongs to the Bing wallpaper group only: it stays hidden when
  * that group is disabled, empty, or when no link has been configured.
  *
- * @return string  Anchor markup, or an empty string when nothing should show.
+ * @param bool $pending  True when the current batch does not reach the Bing
+ *                       group yet. The button is then printed hidden and the
+ *                       frontend script reveals it below that group once the
+ *                       group has been rendered.
+ * @return string        Anchor markup, or an empty string when nothing should show.
  */
-function wp_photo_wall_bing_download_button()
+function wp_photo_wall_bing_download_button($pending = false)
 {
     if (!wp_photo_wall_bing_enabled()) return '';
     if (!wp_photo_wall_bing_get_items()) return '';
@@ -109,10 +113,17 @@ function wp_photo_wall_bing_download_button()
     $url = wp_photo_wall_bing_download_url();
     if ($url === '') return '';
 
+    $class = 'wp-photo-wall-bing-download';
+    if ($pending) {
+        $class .= ' wp-photo-wall-bing-download-pending';
+    }
+
     return sprintf(
-        '<a href="%1$s" class="wp-photo-wall-bing-download" target="_blank" rel="noopener noreferrer">%2$s</a>',
+        '<a href="%1$s" class="%4$s" data-group-id="%3$s" target="_blank" rel="noopener noreferrer">%2$s</a>',
         esc_url($url),
-        esc_html(wp_photo_wall_bing_download_text())
+        esc_html(wp_photo_wall_bing_download_text()),
+        esc_attr(WP_PHOTO_WALL_BING_GROUP_ID),
+        esc_attr($class)
     );
 }
 

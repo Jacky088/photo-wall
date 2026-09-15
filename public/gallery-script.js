@@ -34,6 +34,41 @@
             });
         }
 
+        // The download button is printed at the end of the wall, but it belongs
+        // right below the Bing wallpaper group. When the wall holds more than one
+        // batch that group only shows up later, so keep the button parked under
+        // it as soon as the group reaches the DOM.
+        var $bingDownload = $instance.find('.wp-photo-wall-bing-download');
+
+        function placeBingDownload() {
+            if (!$bingDownload.length) return;
+
+            var groupId = $bingDownload.attr('data-group-id');
+            if (!groupId) return;
+
+            var $section = $wrapper
+                .find('.wp-photo-wall-group-section[data-group-id="' + groupId + '"]')
+                .last();
+            if (!$section.length) return;
+
+            // Already parked right below the group (the loader may sit between).
+            var $first = $section.next();
+            if ($first.is($bingDownload)) return;
+            if ($first.is($loader) && $first.next().is($bingDownload)) return;
+
+            // Keep the original order - group, loader, button - while moving in.
+            if ($loader.length && !$loader.parent().is($wrapper)) {
+                $section.after($loader);
+            }
+            if ($loader.length) {
+                $loader.after($bingDownload);
+            } else {
+                $section.after($bingDownload);
+            }
+
+            $bingDownload.removeClass('wp-photo-wall-bing-download-pending');
+        }
+
         function appendSections(html) {
             $('<div>').html(html).find('.wp-photo-wall-group-section').each(function () {
                 var $section = $(this);
@@ -45,6 +80,7 @@
                 }
             });
             updateItems();
+            placeBingDownload();
         }
 
         function loadMore() {
