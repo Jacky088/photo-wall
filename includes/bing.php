@@ -24,6 +24,7 @@ define('WP_PHOTO_WALL_BING_CRON_HOUR_OPTION', 'photo_wall_bing_cron_hour');
 define('WP_PHOTO_WALL_BING_CRON_LAST_OPTION', 'photo_wall_bing_cron_last');
 
 /** Download button shown right below the wallpapers (empty = hidden). */
+define('WP_PHOTO_WALL_BING_DOWNLOAD_ENABLED_OPTION', 'photo_wall_bing_download_enabled');
 define('WP_PHOTO_WALL_BING_DOWNLOAD_URL_OPTION', 'photo_wall_bing_download_url');
 define('WP_PHOTO_WALL_BING_DOWNLOAD_TEXT_OPTION', 'photo_wall_bing_download_text');
 
@@ -93,6 +94,12 @@ function wp_photo_wall_bing_download_text()
     return $text !== '' ? $text : wp_photo_wall_text('bing_download_default');
 }
 
+/** Whether the download button is enabled. */
+function wp_photo_wall_bing_download_enabled()
+{
+    return get_option(WP_PHOTO_WALL_BING_DOWNLOAD_ENABLED_OPTION, '1') !== '0';
+}
+
 /**
  * Markup of the download button shown below the wallpapers.
  *
@@ -108,6 +115,7 @@ function wp_photo_wall_bing_download_text()
 function wp_photo_wall_bing_download_button($pending = false)
 {
     if (!wp_photo_wall_bing_enabled()) return '';
+    if (!wp_photo_wall_bing_download_enabled()) return '';
     if (!wp_photo_wall_bing_get_items()) return '';
 
     $url = wp_photo_wall_bing_download_url();

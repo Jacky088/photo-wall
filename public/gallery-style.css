@@ -452,12 +452,19 @@ body.wp-photo-wall-lightbox-open { overflow: hidden; }
 }
 
 .wp-photo-wall-download-btn .dashicons {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-    vertical-align: middle;
-    margin-right: 8px;
-    margin-bottom: 2px;
+    font-size: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    line-height: 20px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    margin-right: 8px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    flex-shrink: 0 !important;
 }
 
 @media (max-width: 599px) {

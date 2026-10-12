@@ -2,7 +2,7 @@
 /**
  * Plugin Name: 图片墙插件
  * Description: A minimalist, Apple-inspired photo wall plugin with admin management.
- * Version: 2.8.0
+ * Version: 3.0.0
  * Author: 木木
  * Text Domain: wp-photo-wall
  * Requires at least: 6.0
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('WP_PHOTO_WALL_PATH', plugin_dir_path(__FILE__));
 define('WP_PHOTO_WALL_URL', plugin_dir_url(__FILE__));
-define('WP_PHOTO_WALL_VERSION', '2.8.0');
+define('WP_PHOTO_WALL_VERSION', '3.0.0');
 
 // Load modules
 require_once WP_PHOTO_WALL_PATH . 'includes/i18n.php';
@@ -116,6 +116,8 @@ function wp_photo_wall_admin_enqueue($hook)
             'bing_updated' => wp_photo_wall_text('bing_updated'),
             'leave_confirm' => wp_photo_wall_text('leave_confirm'),
         ),
+        'ajax_url' => admin_url('admin-ajax.php'),
+        'site_url' => home_url('/'),
         'bing_nonce' => wp_create_nonce('wp_photo_wall_bing_nonce'),
     ));
 
@@ -190,6 +192,11 @@ function wp_photo_wall_render_admin_page()
                         $download_link = esc_url_raw(wp_unslash($_POST['wp_photo_wall_download_link']), array('http', 'https'));
                         update_option('wp_photo_wall_download_link', $download_link);
                     }
+
+                    if (isset($_POST['wp_photo_wall_download_text'])) {
+                        $download_text = sanitize_text_field(wp_unslash($_POST['wp_photo_wall_download_text']));
+                        update_option('wp_photo_wall_download_text', $download_text);
+                    }
                 }
 
                 // Save top banner carousel settings + selected slides.
@@ -246,6 +253,8 @@ function wp_photo_wall_render_admin_page()
 
                     // Re-arm the daily event so the new time takes effect at once.
                     wp_photo_wall_bing_cron_schedule();
+
+                    update_option(WP_PHOTO_WALL_BING_DOWNLOAD_ENABLED_OPTION, isset($_POST['photo_wall_bing_download_enabled']) ? '1' : '0');
 
                     $bing_download_url = isset($_POST['photo_wall_bing_download_url'])
                         ? wp_photo_wall_bing_sanitize_download_url(wp_unslash($_POST['photo_wall_bing_download_url']))

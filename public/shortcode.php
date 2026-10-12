@@ -52,8 +52,15 @@ $batch_has_bing = false;
         <noscript><style>.wp-photo-wall-bing-download-pending { display: flex; }</style></noscript>
     <?php endif; ?>
 
-    <?php $download_link = get_option('wp_photo_wall_download_link', ''); if ($download_link) : ?>
-        <a href="<?php echo esc_url($download_link); ?>" class="wp-photo-wall-download-btn" target="_blank" rel="noopener noreferrer"><?php echo esc_html(wp_photo_wall_text('download_all')); ?></a>
+    <?php 
+    $download_link = get_option('wp_photo_wall_download_link', ''); 
+    if ($download_link) : 
+        $download_text = (string) get_option('wp_photo_wall_download_text', '');
+        if ($download_text === '') {
+            $download_text = wp_photo_wall_text('download_all');
+        }
+    ?>
+        <a href="<?php echo esc_url($download_link); ?>" class="wp-photo-wall-download-btn" target="_blank" rel="noopener noreferrer"><?php echo esc_html($download_text); ?></a>
     <?php endif; ?>
 
     <?php if (get_option('wp_photo_wall_enable_lightbox', '1') === '1') : ?>

@@ -38,6 +38,61 @@ function wp_photo_wall_ajax_bing_refresh()
 add_action('wp_ajax_wp_photo_wall_bing_refresh', 'wp_photo_wall_ajax_bing_refresh');
 
 /**
+ * Handle AJAX test connection for Bing API or download URL.
+ */
+function wp_photo_wall_ajax_test_connection()
+{
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(wp_photo_wall_text('permission_denied'));
+    }
+
+    if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'wp_photo_wall_bing_nonce')) {
+        wp_send_json_error('安全校验失败，请刷新页面重试。');
+    }
+
+    $url = isset($_POST['url']) ? esc_url_raw(trim(wp_unslash($_POST['url']))) : '';
+    $type = isset($_POST['type']) ? sanitize_key($_POST['type']) : 'general';
+
+    if (empty($url) || !wp_http_validate_url($url)) {
+        wp_send_json_error('请输入有效的 HTTP / HTTPS 链接地址。');
+    }
+
+    $response = wp_remote_get($url, array(
+        'timeout'     => 10,
+        'sslverify'   => false,
+        'redirection' => 5,
+        'user-agent'  => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) WP-Photo-Wall/' . WP_PHOTO_WALL_VERSION,
+    ));
+
+    if (is_wp_error($response)) {
+        wp_send_json_error('连接失败：' . $response->get_error_message());
+    }
+
+    $code = (int) wp_remote_retrieve_response_code($response);
+    if ($code < 200 || $code >= 400) {
+        wp_send_json_error('目标地址连接异常，HTTP 状态码：' . $code);
+    }
+
+    if ($type === 'bing') {
+        $body = wp_remote_retrieve_body($response);
+        $data = json_decode($body, true);
+        if (!is_array($data) || empty($data['images'])) {
+            wp_send_json_error('接口连通（HTTP ' . $code . '），但返回数据未包含有效的 images 壁纸数组。');
+        }
+        $count = count($data['images']);
+        wp_send_json_success(array(
+            'message' => '连接成功！接口正常解析到 ' . $count . ' 张壁纸（HTTP ' . $code . '）。',
+            'count'   => $count,
+        ));
+    }
+
+    wp_send_json_success(array(
+        'message' => '连接成功！目标地址正常可访问（HTTP ' . $code . '）。',
+    ));
+}
+add_action('wp_ajax_wp_photo_wall_test_connection', 'wp_photo_wall_ajax_test_connection');
+
+/**
  * Handle AJAX Load More Images (with nonce verification)
  */
 function wp_photo_wall_ajax_load_more()
