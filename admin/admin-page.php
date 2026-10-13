@@ -20,10 +20,6 @@ if (!in_array($active_tab, array('banner', 'photos', 'bing'), true)) {
             <span class="wp-pw-version-tag">v<?php echo WP_PHOTO_WALL_VERSION; ?></span>
         </div>
         <div class="wp-pw-header-right">
-            <a href="<?php echo esc_url(home_url('/')); ?>" target="_blank" class="button wp-pw-btn-outline wp-pw-header-preview-btn">
-                <span class="dashicons dashicons-visibility"></span>
-                <span>预览效果</span>
-            </a>
             <button type="button" class="button wp-pw-btn-subtle" id="wp-pw-help-btn">
                 <span class="dashicons dashicons-editor-help"></span>
                 <span>使用帮助</span>
